@@ -7,9 +7,7 @@ namespace SpellSword.Render
         public int Width { get; }
         public int Height { get; }
 
-        public int Layers { get; }
-        private readonly int _colOffset
-            ;
+        private readonly int _colOffset;
         private readonly int _rowOffset;
 
         private readonly IWriteable _writeable;
@@ -19,7 +17,6 @@ namespace SpellSword.Render
             _writeable = writeable;
             Width = writeable.Width;
             Height = writeable.Height;
-            Layers = writeable.Layers;
         }
 
         public TextWriteContext(IWriteable writeable, int width, int height)
@@ -38,7 +35,7 @@ namespace SpellSword.Render
             _rowOffset = row;
         }
 
-        public void SetGlyph(int row, int col, Layer layer, Glyph g)
+        public void SetGlyph(int row, int col, Glyph g)
         {
             if(row >= Height || row < 0)
                 throw new ArgumentOutOfRangeException(nameof(row));
@@ -46,7 +43,18 @@ namespace SpellSword.Render
             if (col >= Width || col < 0)
                 throw new ArgumentOutOfRangeException(nameof(col));
 
-            _writeable.SetGlyph(_rowOffset + row, _colOffset + col, layer, g);
+            _writeable.SetGlyph(_rowOffset + row, _colOffset + col, g);
+        }
+
+        public void WriteGlyph(int row, int col, Glyph g)
+        {
+            if (row >= Height || row < 0)
+                throw new ArgumentOutOfRangeException(nameof(row));
+
+            if (col >= Width || col < 0)
+                throw new ArgumentOutOfRangeException(nameof(col));
+
+            _writeable.WriteGlyph(_rowOffset + row, _colOffset + col, g);
         }
     }
 }

@@ -6,7 +6,6 @@ namespace SpellSword.Render.Panes
 {
     class TextPane: Pane
     {
-        private bool _dirty;
         private string _text;
 
         public string Text
@@ -16,7 +15,7 @@ namespace SpellSword.Render.Panes
             {
                 Width = _text?.Length ?? 0;
                 _text = value;
-                _dirty = true;
+                Dirty = true;
             }
         }
 
@@ -33,14 +32,14 @@ namespace SpellSword.Render.Panes
 
         public override bool Paint(IWriteable writeContext)
         {
-            if (!_dirty)
+            if (!Dirty)
                 return false;
 
-            writeContext.Clear(Layer.Main);
+            writeContext.Clear();
 
             StringPrinter.Print(Text, writeContext, 0, 0);
 
-            _dirty = false;
+            Dirty = false;
             return true;
         }
     }

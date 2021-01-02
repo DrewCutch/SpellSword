@@ -11,7 +11,6 @@ namespace SpellSword.Render.Panes
     {
         private Logger _logger;
 
-        private bool _dirty;
 
         private Dictionary<Coord, ILinkable> _linkMask;
 
@@ -19,24 +18,24 @@ namespace SpellSword.Render.Panes
         {
             _logger = logger;
             logger.MessageLogged += NewMessage;
-            _dirty = true;
+            Dirty = true;
             _linkMask = new Dictionary<Coord, ILinkable>();
         }
 
         private void NewMessage(LogMessage message)
         {
-            _dirty = true;
+            Dirty = true;
         }
 
         public override bool Paint(IWriteable writeContext)
         {
-            if (!_dirty)
+            if (!Dirty)
                 return false;
 
             Coord nextMessage = new Coord(0,0);
             _linkMask.Clear();
 
-            writeContext.Clear(Layer.Main);
+            writeContext.Clear();
 
             foreach (LogMessage message in _logger.MostRecent())
             {
@@ -51,7 +50,7 @@ namespace SpellSword.Render.Panes
                     break;
             }
 
-            _dirty = false;
+            Dirty = false;
             return true;
         }
 

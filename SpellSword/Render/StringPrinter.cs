@@ -114,7 +114,7 @@ namespace SpellSword.Render
         {
             for (int i = 0; i < str.Length; i++)
             {
-                writeable.SetGlyph(y, x + i, Layer.Main, new Glyph(str[i], color));
+                writeable.SetGlyph(y, x + i, new Glyph(str[i], color));
             }
         }
     }

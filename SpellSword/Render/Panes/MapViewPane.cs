@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using BearLib;
 using GoRogue;
 using GoRogue.GameFramework;
@@ -13,9 +15,7 @@ namespace SpellSword.Render.Panes
 {
     class MapViewPane: Pane
     {
-        public IMapView<Glyph[]> GlyphMapView { get; }
-
-        private bool _dirty;
+        public IMapView<IEnumerable<Glyph>> GlyphMapView { get; }
 
         private readonly MessageBus _controlBus;
         private readonly LightMap _lightMap;
@@ -46,21 +46,20 @@ namespace SpellSword.Render.Panes
             _controlBus = controlBus;
             _joystickConfig = controls;
 
-            _dirty = true;
+            Dirty = true;
         }
 
         public void SetDirty()
         {
-            _dirty = true;
+            Dirty = true;
         }
 
         public override bool Paint(IWriteable writeContext)
         {
-            if (!_dirty)
+            if (!Dirty)
                 return false;
 
-            writeContext.Clear(Layer.Main);
-            writeContext.Clear(Layer.Low);
+            writeContext.Clear();
 
             for (int x = 0; x < writeContext.Width && x + Offset.X < GlyphMapView.Width; x++)
                 for (int y = 0; y < writeContext.Height && y + Offset.Y < GlyphMapView.Height; y++)
@@ -68,12 +67,13 @@ namespace SpellSword.Render.Panes
                     if (!_exploredMap[x + Offset.X, y + Offset.Y])
                         continue;
 
-
-                    writeContext.SetGlyph(y, x, Layer.Main, GlyphMapView[x + Offset.X, y + Offset.Y][Layer.Main.MapNum].MultipliedByColor(_lightMap[x + Offset.X, y + Offset.Y]));
-                    writeContext.SetGlyph(y, x, Layer.Low, GlyphMapView[x + Offset.X, y + Offset.Y][Layer.Low.MapNum].MultipliedByColor(_lightMap[x + Offset.X, y + Offset.Y]));
+                    foreach (Glyph glyph in GlyphMapView[x + Offset.X, y + Offset.Y])
+                    {
+                        writeContext.WriteGlyph(y, x, glyph.MultipliedByColor(_lightMap[x + Offset.X, y + Offset.Y]));
+                    }
                 }
 
-            _dirty = false;
+            Dirty = false;
 
             return true;
         }

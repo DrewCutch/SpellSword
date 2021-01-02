@@ -14,7 +14,6 @@ namespace SpellSword.Render.Panes
         private readonly Color _fillColor;
         private readonly Color _capacityColor;
 
-        private bool _dirty;
 
         public FillBarPane(ResourceMeter meter, String label, Color fillColor, Color capacityColor)
         {
@@ -22,7 +21,7 @@ namespace SpellSword.Render.Panes
             Label = label;
             _fillColor = fillColor;
             _capacityColor = capacityColor;
-            _dirty = true;
+            Dirty = true;
 
             Height = 1;
 
@@ -32,12 +31,12 @@ namespace SpellSword.Render.Panes
 
         private void OnCapacityChanged(int oldVal, int newVal)
         {
-            _dirty = true;
+            Dirty = true;
         }
 
         private void OnValueChanged(int oldVal, int newVal)
         {
-            _dirty = true;
+            Dirty = true;
         }
 
         public override void SuggestHeight(int height)
@@ -47,18 +46,18 @@ namespace SpellSword.Render.Panes
 
         public override bool Paint(IWriteable writeContext)
         {
-            if (!_dirty)
+            if (!Dirty)
                 return false;
 
             int width = writeContext.Width;
             int fill = width * ResourceMeter.CurrentValue / ResourceMeter.MaxCapacity;
             int cap = width * ResourceMeter.CurrentCapacity / ResourceMeter.MaxCapacity;
 
-            writeContext.Clear(Layer.Main);
+            writeContext.Clear();
             for (int i = 0; i < cap; i++)
-                writeContext.SetGlyph(0, i, Layer.Main, new Glyph(i < Label.Length ? Label[i] : ' ', _fillColor.Inverted(), i <= fill ? _fillColor : _capacityColor));
+                writeContext.SetGlyph(0, i, new Glyph(i < Label.Length ? Label[i] : ' ', _fillColor.Inverted(), i <= fill ? _fillColor : _capacityColor));
 
-            _dirty = false;
+            Dirty = false;
             return true;
         }
     }

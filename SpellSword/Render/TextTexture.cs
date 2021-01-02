@@ -11,51 +11,41 @@ namespace SpellSword.Render
         public int Width { get; }
         public int Height { get; }
 
-        public int Layers { get; }
+        public readonly Glyph[][] Contents;
 
-        public readonly Glyph[][][] Contents;
+        public bool Dirty { get; private set; }
 
-        private uint _dirtyMask;
-
-        public TextTexture(int width, int height, int layers = Layer.Layers)
+        public TextTexture(int width, int height)
         {
             Width = width;
             Height = height;
-            Layers = layers;
-            _dirtyMask = 0;
+            Dirty = false;
 
-            Contents = new Glyph[layers][][];
-            for (int i = 0; i < layers; i++)
+            Contents = new Glyph[height][];
+            for (int j = 0; j < height; j++)
             {
-                Contents[i] = new Glyph[height][];
-                for (int j = 0; j < height; j++)
-                {
-                    Contents[i][j] = new Glyph[width];
-                }
+                Contents[j] = new Glyph[width];
             }
         }
 
-        public void SetGlyph(int row, int col, Layer layer, Glyph g)
+        public void WriteGlyph(int row, int col, Glyph glyph)
         {
-            if (Contents[layer.Num][row][col] == g)
+            SetGlyph(row, col, glyph);
+        }
+
+        public void SetGlyph(int row, int col, Glyph g)
+        {
+            if (Contents[row][col] == g)
                 return;
 
-            _dirtyMask |= layer.Mask;
-            Contents[layer.Num][row][col] = g;
+            Dirty = true;
+            Contents[row][col] = g;
         }
 
-        public IEnumerable<Tuple<Layer, Glyph[][]>> DirtyLayers()
-        {
-            foreach (Layer layer in Layer.AllLayers())
-            {
-                if ((_dirtyMask & layer.Mask) == layer.Mask)
-                    yield return new Tuple<Layer, Glyph[][]>(layer, Contents[layer.Num]);
-            }
-        }
 
         public void Clean()
         {
-            _dirtyMask = 0;
+            Dirty = false;
         }
     }
 }

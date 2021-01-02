@@ -9,6 +9,8 @@ namespace SpellSword.Render.Panes
         public int Height { get; protected set; }
         public bool HasFocus { get; private set; }
 
+        public bool Dirty { get; protected set; }
+
         public Pane()
         {
         }

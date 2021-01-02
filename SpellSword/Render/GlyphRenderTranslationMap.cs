@@ -9,24 +9,20 @@ using SpellSword.Engine.Components;
 
 namespace SpellSword.Render
 {
-    class GlyphRenderTranslationMap: TranslationMap<IEnumerable<IGameObject>, Glyph[]>
+    class GlyphRenderTranslationMap: TranslationMap<IEnumerable<IGameObject>, IEnumerable<Glyph>>
     {
         public GlyphRenderTranslationMap(IMapView<IEnumerable<IGameObject>> baseMap) : base(baseMap)
         {
             
         }
 
-        protected override Glyph[] TranslateGet(IEnumerable<IGameObject> value)
+        protected override IEnumerable<Glyph> TranslateGet(IEnumerable<IGameObject> value)
         {
-            Glyph[] glyphs = new Glyph[3] {Glyph.Blank, Glyph.Blank, Glyph.Blank};
-
-            foreach (IGameObject gameObject in value)
+            foreach (IGameObject gameObject in value.Reverse())
             {
                 if (gameObject.HasComponent<GlyphComponent>())
-                    glyphs[gameObject.Layer] = gameObject.GetComponent<GlyphComponent>().Glyph;
+                    yield return gameObject.GetComponent<GlyphComponent>().Glyph;
             }
-
-            return glyphs;
         }
     }
 }

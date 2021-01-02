@@ -5,6 +5,7 @@ using System.Text;
 
 namespace SpellSword.Render
 {
+    /*
     public sealed class Layer
     {
         public static Layer Background = new Layer(0);
@@ -33,4 +34,5 @@ namespace SpellSword.Render
             Mask = (uint) (1 << Num);
         }
     }
+    */
 }

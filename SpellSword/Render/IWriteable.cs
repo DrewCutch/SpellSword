@@ -8,15 +8,15 @@ namespace SpellSword.Render
         int Width { get; }
         int Height { get; }
 
-        int Layers { get; }
+        void SetGlyph(int row, int col, Glyph glyph);
 
-        void SetGlyph(int row, int col, Layer layer, Glyph glyph);
+        void WriteGlyph(int row, int col, Glyph glyph);
 
-        public void Clear(Layer layer)
+        public void Clear()
         {
             for (int i = 0; i < Height; i++)
                 for (int j = 0; j < Width; j++)
-                    SetGlyph(i, j, layer, Glyph.Blank);
+                    SetGlyph(i, j, Glyph.Blank);
         }
     }
 }

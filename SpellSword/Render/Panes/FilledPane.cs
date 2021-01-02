@@ -15,7 +15,7 @@
             {
                 for (int j = 0; j < writeContext.Height; j++)
                 {
-                    writeContext.SetGlyph(j, i, Layer.Main, Fill);
+                    writeContext.SetGlyph(j, i, Fill);
                 }
             }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using GoRogue;
 using SpellSword.RPG;
+using SpellSword.RPG.Items;
 using SpellSword.Util;
 
 namespace SpellSword.Render.Panes
@@ -11,28 +12,26 @@ namespace SpellSword.Render.Panes
     {
         public EquipmentSlotSet EquipmentSlotSet { get; }
 
-        private bool _dirty;
-
         public InventoryDisplayPane(EquipmentSlotSet equipmentSlotSet)
         {
             EquipmentSlotSet = equipmentSlotSet;
-            _dirty = true;
+            Dirty = true;
 
             EquipmentSlotSet.OnEquipped += OnEquipped;
         }
 
-        private void OnEquipped(EquipmentSlot arg1, IEquippable arg2)
+        private void OnEquipped(EquipmentSlot arg1, Item arg2)
         {
-            _dirty = true;
+            Dirty = true;
         }
 
         public override bool Paint(IWriteable writeContext)
         {
-            if (!_dirty)
+            if (!Dirty)
                 return false;
 
             Coord nextMessage = new Coord(0,0);
-            writeContext.Clear(Layer.Main);
+            writeContext.Clear();
 
             foreach (EquipmentSlot equipmentSlot in EquipmentSlotSet.Slots)
             {
@@ -41,7 +40,7 @@ namespace SpellSword.Render.Panes
                 nextMessage = new Coord(0, lineEnd.Y + 1);
             }
 
-            _dirty = false;
+            Dirty = false;
 
             return true;
         }

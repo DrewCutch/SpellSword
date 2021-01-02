@@ -12,7 +12,7 @@ namespace SpellSword.Render
     class BearTermRenderer: ISubscriber<ParticleEvent>
     {
         private Pane _root;
-        private TextTexture _texture;
+        private TerminalWritable _texture;
 
         private HashSet<IParticleEffect> _particleEffects;
 
@@ -29,7 +29,7 @@ namespace SpellSword.Render
 
             Terminal.Set(options);
 
-            _texture = new TextTexture(Terminal.State(Terminal.TK_WIDTH), Terminal.State(Terminal.TK_HEIGHT));
+            _texture = new TerminalWritable(Terminal.State(Terminal.TK_WIDTH), Terminal.State(Terminal.TK_HEIGHT), 0);
             _lastFrame = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
             _particleEffects = new HashSet<IParticleEffect>();
             _particleEffectRemoved = false;
@@ -44,15 +44,9 @@ namespace SpellSword.Render
             long now = Environment.TickCount;
             long deltaTime = now - _lastFrame;
 
-            foreach (IParticleEffect particleEffect in _particleEffects)
-            {
-                particleEffect.Update(deltaTime);
-                particlesUpdated |= particleEffect.Changed;
-            }
+            //((IWriteable) _texture).Clear();
 
-            _particleEffects.RemoveWhere(effect => effect.Finished);
-            
-            if(particlesUpdated || _particleEffectRemoved)
+            if (particlesUpdated || _particleEffectRemoved)
                PaintParticles();
 
             _root.SuggestWidth(_texture.Width);
@@ -60,7 +54,22 @@ namespace SpellSword.Render
 
             _root.Paint(_texture);
 
-            Paint(_texture);
+            foreach (IParticleEffect particleEffect in _particleEffects)
+            {
+                particleEffect.Update(deltaTime);
+                particlesUpdated |= particleEffect.Changed;
+            }
+
+            _particleEffects.RemoveWhere(effect => effect.Finished);
+
+            if (particlesUpdated || _particleEffectRemoved)
+                PaintParticles();
+
+            if (_texture.Dirty)
+            {
+                Terminal.Refresh();
+                _texture.Clean();
+            }
 
             _particleEffectRemoved = false;
             _lastFrame = now;
@@ -68,13 +77,11 @@ namespace SpellSword.Render
 
         private void PaintParticles()
         {
-            ((IWriteable) _texture).Clear(Layer.High);
-
             foreach (IParticleEffect effect in _particleEffects)
             {
                 foreach (Particle particle in effect.Particles())
                 {
-                    _texture.SetGlyph(particle.Pos.Y, particle.Pos.X, Layer.High, particle.Glyph);
+                    _texture.WriteGlyph(particle.Pos.Y, particle.Pos.X, particle.Glyph);
                 }
             }
         }
@@ -90,7 +97,7 @@ namespace SpellSword.Render
             }
         }
 
-        public void Paint(TextTexture texture)
+        /*public void Paint(TextTexture texture)
         {
             bool dirty = false;
             bool compositing = false;
@@ -129,7 +136,7 @@ namespace SpellSword.Render
                 Terminal.Refresh();
 
             texture.Clean();
-        }
+        }*/
 
         public void AddEffect(IParticleEffect effect)
         {
