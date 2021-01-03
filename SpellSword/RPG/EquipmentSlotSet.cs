@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SpellSword.Actors.Action;
+using SpellSword.RPG.Items;
 
 namespace SpellSword.RPG
 {
@@ -12,25 +13,25 @@ namespace SpellSword.RPG
 
         public HashSet<EquipmentSlot> SlotsInUse { get; private set; }
 
-        public IReadOnlyDictionary<EquipmentSlot, IEquippable> Equipped => _equipped;
+        public IReadOnlyDictionary<EquipmentSlot, Item> Equipped => _equipped;
 
-        private Dictionary<EquipmentSlot, IEquippable> _equipped;
+        private Dictionary<EquipmentSlot, Item> _equipped;
 
-        public event Action<EquipmentSlot, IEquippable> OnEquipped;
-        public event Action<EquipmentSlot, IEquippable> OnUnequipped;
+        public event Action<EquipmentSlot, Item> OnEquipped;
+        public event Action<EquipmentSlot, Item> OnUnequipped;
 
         public EquipmentSlotSet()
         {
             Slots = EquipmentSlot.AllSlots.ToList();
             SlotsInUse = new HashSet<EquipmentSlot>();
-            _equipped = new Dictionary<EquipmentSlot, IEquippable>();
+            _equipped = new Dictionary<EquipmentSlot, Item>();
         }
 
         public EquipmentSlotSet(List<EquipmentSlot> slots)
         {
             Slots = slots;
             SlotsInUse = new HashSet<EquipmentSlot>();
-            _equipped = new Dictionary<EquipmentSlot, IEquippable>();
+            _equipped = new Dictionary<EquipmentSlot, Item>();
         }
 
         public IUsable GetMain()
@@ -46,7 +47,7 @@ namespace SpellSword.RPG
             return null;
         }
 
-        public bool Equip(IEquippable equippable, EquipmentSlot slot)
+        public bool Equip(Item equippable, EquipmentSlot slot)
         {
             if (equippable.SlotKind != slot.Kind)
                 return false;
