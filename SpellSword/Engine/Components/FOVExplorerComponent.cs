@@ -7,11 +7,11 @@ using GoRogue.GameFramework.Components;
 
 namespace SpellSword.Engine.Components
 {
-    class FOVExplorerComponent: IGameObjectComponent
+    class FOVExplorerComponent: Component
     {
         private IGameObject _parent;
 
-        public IGameObject Parent
+        public override IGameObject Parent
         {
             get => _parent;
             set

@@ -8,9 +8,8 @@ using SpellSword.Update;
 
 namespace SpellSword.Engine.Components
 {
-    class ProjectileComponent: IGameObjectComponent, IUpdate
+    class ProjectileComponent: Component, IUpdate
     {
-        public IGameObject Parent { get; set; }
 
         public event Action<IGameObject> OnCollide;
 
@@ -34,8 +33,6 @@ namespace SpellSword.Engine.Components
             XRate = xRate == 0 ? int.MaxValue : Math.Abs(xRate);
             YRate = yRate == 0 ? int.MaxValue : Math.Abs(yRate);
         }
-
-
         public void Update(int ticks)
         {
             _xTicks += ticks;
@@ -68,6 +65,14 @@ namespace SpellSword.Engine.Components
                 else
                     Parent.Position = newPos;
             }
+        }
+
+        public override Component CloneTo(IGameObject gameObject)
+        {
+            ProjectileComponent clone = new ProjectileComponent(XRate, YRate);
+            gameObject.AddComponent(clone);
+
+            return clone;
         }
     }
 }

@@ -7,10 +7,8 @@ using SpellSword.RPG.Items;
 
 namespace SpellSword.Engine.Components
 {
-    class ItemComponent: IGameObjectComponent
+    class ItemComponent: Component
     {
-        public IGameObject Parent { get; set; }
-
         public Item Item { get; }
 
         public ItemComponent(Item item)

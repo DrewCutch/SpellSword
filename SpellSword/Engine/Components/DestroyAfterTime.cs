@@ -4,10 +4,8 @@ using SpellSword.Update;
 
 namespace SpellSword.Engine.Components
 {
-    class DestroyAfterTime: IGameObjectComponent, IUpdate
+    class DestroyAfterTime: Component, IUpdate
     {
-        public IGameObject Parent { get; set; }
-
         public int Time { get; }
         
         private int _count;
@@ -24,6 +22,14 @@ namespace SpellSword.Engine.Components
 
             if (_count >= Time)
                 Parent.CurrentMap.RemoveEntity(Parent);
+        }
+
+        public override Component CloneTo(IGameObject gameObject)
+        {
+            DestroyAfterTime clone = new DestroyAfterTime(Time);
+            gameObject.AddComponent(clone);
+
+            return clone;
         }
     }
 }

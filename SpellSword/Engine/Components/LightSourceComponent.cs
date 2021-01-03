@@ -8,7 +8,7 @@ using SpellSword.Render.Lighting;
 
 namespace SpellSword.Engine.Components
 {
-    class LightSourceComponent: IGameObjectComponent
+    class LightSourceComponent: Component
     {
         private IGameObject _parent;
 

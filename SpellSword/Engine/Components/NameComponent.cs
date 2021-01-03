@@ -6,10 +6,8 @@ using GoRogue.GameFramework.Components;
 
 namespace SpellSword.Engine.Components
 {
-    class NameComponent: IGameObjectComponent
+    class NameComponent: Component
     {
-        public IGameObject Parent { get; set; }
-
         public string Name { get; }
 
         public NameComponent(string name)

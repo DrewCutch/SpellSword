@@ -5,9 +5,8 @@ using SpellSword.Render;
 
 namespace SpellSword.Engine.Components
 {
-    class GlyphComponent: IGameObjectComponent
+    class GlyphComponent: Component
     {
-        public IGameObject Parent { get; set; }
 
         public Glyph Glyph { get; set; }
 
