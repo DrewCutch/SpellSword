@@ -12,7 +12,7 @@ namespace SpellSword.Engine.Components
     {
         private IGameObject _parent;
 
-        public IGameObject Parent
+        public override IGameObject Parent
         {
             get => _parent;
             set
