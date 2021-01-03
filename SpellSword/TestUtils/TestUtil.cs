@@ -14,6 +14,7 @@ using SpellSword.Render;
 using SpellSword.RPG;
 using SpellSword.RPG.Alignment;
 using SpellSword.RPG.Items;
+using SpellSword.Speech;
 using SpellSword.Time;
 
 namespace SpellSword.TestUtils
@@ -35,7 +36,7 @@ namespace SpellSword.TestUtils
             goblin.AddComponent(goblinActor);
             goblin.AddComponent(new GlyphComponent(new Glyph('g', Color.ForestGreen)));
 
-            goblin.AddComponent(new NameComponent("goblin"));
+            goblin.AddComponent(new NameComponent(new Title("a","goblin")));
 
             timeline.OnAdvance += goblinActor.Update;
 
