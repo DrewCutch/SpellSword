@@ -72,8 +72,11 @@ namespace SpellSword.Actors
             _aimVisualization?.Stop();
             _aimVisualization = null;
 
+            if (actor.Parent.CurrentMap.GetObject(actor.Parent.Position + dir)?.GetComponent<IInteractable>() is IInteractable interactable)
+                return new InteractAction(actor, interactable);
+
             if (actor.Parent.CurrentMap.GetObject(actor.Parent.Position + dir) != null && 
-                actor.Being.Equipment.GetMain().CanUse(actor, actor.Parent.Position + dir))
+                    actor.Being.Equipment.GetMain().CanUse(actor, actor.Parent.Position + dir))
                 return new UseAction(actor, actor.Parent.Position + dir, actor.Being.Equipment.GetMain());
 
             if (actor.Parent.CurrentMap.GetObject(actor.Parent.Position + dir) != null && !actor.Parent.CurrentMap.GetObject(actor.Parent.Position + dir).IsWalkable)
