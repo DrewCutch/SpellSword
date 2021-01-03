@@ -13,6 +13,7 @@ using SpellSword.Engine.Components;
 using SpellSword.Render;
 using SpellSword.RPG;
 using SpellSword.RPG.Alignment;
+using SpellSword.RPG.Items;
 using SpellSword.Time;
 
 namespace SpellSword.TestUtils
@@ -24,7 +25,7 @@ namespace SpellSword.TestUtils
         public static GameObject CreateGoblin(Coord pos, Actor player, Timeline timeline, GoalMapStore goalMapStore, MessageBus mainBus) { 
             GameObject goblin = new GameObject(pos, Layers.Main, null, isWalkable:true);
 
-            IEquippable mainWeapon = new MeleeWeapon(new Damage(1)); // new ProjectileWeapon(3);
+            Item mainWeapon = new MeleeWeapon(new Damage(1)); // new ProjectileWeapon(3);
 
             Being goblinBeing = new Being(new SelectedAttributes(new AttributeSet(6, 15, 4, 4, 3)), goblins, new EquipmentSlotSet(), 4, "goblin");
 
@@ -33,6 +34,9 @@ namespace SpellSword.TestUtils
             Actor goblinActor = new Actor(goblinBeing, new BasicAgent(player, goalMapStore), mainBus);
             goblin.AddComponent(goblinActor);
             goblin.AddComponent(new GlyphComponent(new Glyph('g', Color.ForestGreen)));
+
+            goblin.AddComponent(new NameComponent("goblin"));
+
             timeline.OnAdvance += goblinActor.Update;
 
             return goblin;
