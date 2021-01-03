@@ -13,6 +13,7 @@ namespace SpellSword.Render
     {
         private Pane _root;
         private TerminalWritable _texture;
+        private TerminalWritable _particleWritable;
 
         private HashSet<IParticleEffect> _particleEffects;
 
@@ -30,6 +31,8 @@ namespace SpellSword.Render
             Terminal.Set(options);
 
             _texture = new TerminalWritable(Terminal.State(Terminal.TK_WIDTH), Terminal.State(Terminal.TK_HEIGHT), 0);
+            _particleWritable = new TerminalWritable(Terminal.State(Terminal.TK_WIDTH), Terminal.State(Terminal.TK_HEIGHT), 1);
+
             _lastFrame = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
             _particleEffects = new HashSet<IParticleEffect>();
             _particleEffectRemoved = false;
@@ -43,11 +46,6 @@ namespace SpellSword.Render
 
             long now = Environment.TickCount;
             long deltaTime = now - _lastFrame;
-
-            //((IWriteable) _texture).Clear();
-
-            if (particlesUpdated || _particleEffectRemoved)
-               PaintParticles();
 
             _root.SuggestWidth(_texture.Width);
             _root.SuggestHeight(_texture.Height);
@@ -65,6 +63,12 @@ namespace SpellSword.Render
             if (particlesUpdated || _particleEffectRemoved)
                 PaintParticles();
 
+            if (_particleWritable.Dirty)
+            {
+                Terminal.Refresh();
+                _particleWritable.Clean();
+            }
+
             if (_texture.Dirty)
             {
                 Terminal.Refresh();
@@ -77,11 +81,13 @@ namespace SpellSword.Render
 
         private void PaintParticles()
         {
+            ((IWriteable)_particleWritable).Clear();
+
             foreach (IParticleEffect effect in _particleEffects)
             {
                 foreach (Particle particle in effect.Particles())
                 {
-                    _texture.WriteGlyph(particle.Pos.Y, particle.Pos.X, particle.Glyph);
+                    _particleWritable.WriteGlyph(particle.Pos.Y + 1, particle.Pos.X, particle.Glyph);
                 }
             }
         }
