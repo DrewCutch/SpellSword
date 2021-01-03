@@ -32,6 +32,7 @@ namespace SpellSword
             UpdatingGameObject.MainTimeline = timeline;
             MessageBus mainBus = new MessageBus();
             Spawner spawner = new Spawner(map);
+            
             mainBus.RegisterSubscriber(spawner);
 
             JoystickConfig joystickConfig = new JoystickConfig
@@ -41,7 +42,7 @@ namespace SpellSword
             LightMap lightMap = new LightMap(120, 30, map.TransparencyView);
 
             //lightMap.AddLight(new Light(Color.AntiqueWhite, new Coord(1, 1), 15, 5));
-            lightMap.AddLight(new Light(Color.Wheat, new Coord(8, 8), 5, 100));
+            lightMap.AddLight(new Light(Color.Wheat, new Coord(8, 8), 20, 10000));
 
             // Creating Player
             GameObject player = UpdatingGameObject.CreateUpdatingGameObject(new Coord(8, 8), Layers.Main, null);
@@ -68,9 +69,16 @@ namespace SpellSword
             map.ObjectMoved += (sender, eventArgs) => viewPane.SetDirty();
             map.ObjectAdded += (sender, eventArgs) => viewPane.SetDirty();
 
+
+            TextPane descriptionPane = new TextPane("TEST TEXT");
+
+            Describer describer = new Describer(descriptionPane, map);
+            mainBus.RegisterSubscriber(describer);
+
             LogPane logPane = new LogPane(logger);
 
             StackPane mapAndConsole = new StackPane(StackPane.StackDirection.Vertical);
+            mapAndConsole.AddChild(descriptionPane, 1);
             mapAndConsole.AddChild(viewPane, 4);
             mapAndConsole.AddChild(logPane, 1);
             
