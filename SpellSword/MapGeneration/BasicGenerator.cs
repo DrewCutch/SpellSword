@@ -10,6 +10,7 @@ using GoRogue.MapGeneration.Connectors;
 using GoRogue.MapViews;
 using GoRogue.Pathing;
 using GoRogue.Random;
+using SpellSword.Engine;
 using SpellSword.Engine.Components;
 using SpellSword.Render;
 using Rectangle = GoRogue.Rectangle;
@@ -20,7 +21,7 @@ namespace SpellSword.MapGeneration
     {
         public Map Generate(int width, int height)
         {
-            return new Map(CreateTerrain(width, height), 3, Distance.MANHATTAN);
+            return new Map(CreateTerrain(width, height), Layers.Effects + 1, Distance.MANHATTAN);
         }
 
         private ISettableMapView<IGameObject> CreateTerrain(int width, int height)
@@ -134,8 +135,7 @@ namespace SpellSword.MapGeneration
 
             foreach (Coord position in dimensions.PerimeterPositions())
             {
-                IGameObject obstacle = new GameObject(position, Layer.Low.MapNum, null, true, false, false);
-                obstacle.AddComponent(new GlyphComponent(new Glyph(Color.DimGray)));
+                IGameObject obstacle = CreateWall(position);
 
                 mapView[position] = obstacle;
             }
@@ -147,14 +147,16 @@ namespace SpellSword.MapGeneration
 
         private static IGameObject CreateWall(Coord pos)
         {
-            IGameObject wall = new GameObject(pos, Layer.Low.MapNum, null, true, false, false);
+            IGameObject wall = new GameObject(pos, Layers.Terrain, null, true, false, false);
             wall.AddComponent(new GlyphComponent(new Glyph(Color.DimGray)));
+            wall.AddComponent(new NameComponent("stone wall"));
+
             return wall;
         }
 
         private static IGameObject CreateFloor(Coord pos)
         {
-            IGameObject floor = new GameObject(pos, Layer.Low.MapNum, null, true);
+            IGameObject floor = new GameObject(pos, Layers.Terrain, null, true);
 
 
             int color = SingletonRandom.DefaultRNG.Next(160, 170);
@@ -163,6 +165,7 @@ namespace SpellSword.MapGeneration
             GlyphComponent glyphComponent = new GlyphComponent(new Glyph('█', tileColor, tileColor));
             floor.AddComponent(glyphComponent);
             floor.AddComponent(new DecalComponent(glyphComponent));
+            floor.AddComponent(new NameComponent("stone floor"));
 
             return floor;
         }
