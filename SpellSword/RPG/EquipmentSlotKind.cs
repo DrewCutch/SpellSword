@@ -11,6 +11,7 @@ namespace SpellSword.RPG
         Hand,
         Foot,
         Legs,
-        Arm
+        Arm,
+        None
     }
 }
