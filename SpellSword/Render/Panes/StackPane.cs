@@ -80,7 +80,9 @@ namespace SpellSword.Render.Panes
             if (_children.Count == 0)
                 return this;
 
-            return GetChild(pos).Pane;
+            StackPaneChild child = GetChild(pos);
+
+            return child.Pane.Focus(pos - GetOffset(child));
         }
 
         public override void OnMouseMove(Coord last, Coord current)
