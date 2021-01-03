@@ -1,6 +1,5 @@
 ﻿using System.Drawing;
 using GoRogue.GameFramework;
-using SpellSword.ECS.Components;
 
 namespace SpellSword.Logging
 {
