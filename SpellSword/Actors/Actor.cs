@@ -9,6 +9,7 @@ using SpellSword.Logging;
 using SpellSword.Render;
 using SpellSword.Render.Particles;
 using SpellSword.RPG.Items;
+using SpellSword.Speech;
 using SpellSword.Update;
 
 namespace SpellSword.Actors
@@ -79,7 +80,7 @@ namespace SpellSword.Actors
 
         public void DoDamage(Damage damage)
         {
-            Parent.CurrentMap.GetTerrain(Parent.Position).GetComponent<IDecalable>()?.SetDecal(new Glyph(Color.FromArgb(100, Color.DarkRed)));
+            Parent.CurrentMap.GetTerrain(Parent.Position).GetComponent<IDecalable>()?.SetDecal(new Decal(new Title("in", "a", "pool of blood"), new Glyph(Color.FromArgb(100, Color.DarkRed))));
             Being.DoDamage(damage);
         }
         

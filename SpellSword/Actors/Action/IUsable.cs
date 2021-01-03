@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Text;
 using GoRogue;
 using SpellSword.Render.Particles;
+using SpellSword.Speech;
 using SpellSword.Time;
 
 namespace SpellSword.Actors.Action
 {
     interface IUsable
     {
-        public string Name { get; }
+        public Title Title { get; }
         
         public int Range { get; }
         

@@ -7,8 +7,8 @@ namespace SpellSword.Engine.Components
 {
     interface IDecalable
     {
-        public Glyph Decal { get; }
+        public Decal Decal { get; }
 
-        public void SetDecal(Glyph glyph);
+        public void SetDecal(Decal decal);
     }
 }

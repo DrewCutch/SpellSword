@@ -23,7 +23,7 @@ namespace SpellSword.Engine.Components
             }
         }
 
-        public Glyph Decal { get; private set; }
+        public Decal Decal { get; private set; }
 
         private GlyphComponent _glyphComponent;
 
@@ -33,12 +33,12 @@ namespace SpellSword.Engine.Components
             Decal = null;
         }
 
-        public void SetDecal(Glyph glyph)
+        public void SetDecal(Decal decal)
         {
-            if(_glyphComponent != null && glyph != null)
-                _glyphComponent.Glyph = new Glyph(glyph.Character, glyph.Color, _glyphComponent.Glyph.BackgroundColor);
+            if(_glyphComponent != null && decal != null)
+                _glyphComponent.Glyph = new Glyph(decal.Glyph.Character, decal.Glyph.Color, _glyphComponent.Glyph.BackgroundColor);
 
-            Decal = glyph;
+            Decal = decal;
         }
     }
 }

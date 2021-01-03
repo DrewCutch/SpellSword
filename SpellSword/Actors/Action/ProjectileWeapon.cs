@@ -8,20 +8,21 @@ using GoRogue.GameFramework;
 using SpellSword.Engine;
 using SpellSword.Engine.Components;
 using SpellSword.Render;
+using SpellSword.Speech;
 using SpellSword.Time;
 
 namespace SpellSword.Actors.Action
 {
     class ProjectileWeapon: IUsable
     {
-        public string Name { get; }
+        public Title Title { get; }
         public int Range { get; }
         public Distance RangeDistanceType => Distance.EUCLIDEAN;
 
         public ProjectileWeapon(int range)
         {
             Range = range;
-            Name = "bow";
+            Title = new Title("a", "bow");
         }
         
         public void Use(Actor by, Coord target)

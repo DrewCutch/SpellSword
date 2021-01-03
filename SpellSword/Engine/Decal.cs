@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using GoRogue.GameFramework;
-using GoRogue.GameFramework.Components;
+using SpellSword.Render;
 using SpellSword.Speech;
 
-namespace SpellSword.Engine.Components
+namespace SpellSword.Engine
 {
-    class NameComponent: Component
+    class Decal
     {
         public Title Title { get; }
+        public Glyph Glyph { get; }
 
-        public NameComponent(Title title)
+        public Decal(Title title, Glyph glyph)
         {
             Title = title;
+            Glyph = glyph;
         }
     }
 }

@@ -7,6 +7,7 @@ using GoRogue.Messaging;
 using SpellSword.Engine.Components;
 using SpellSword.Input;
 using SpellSword.Render.Panes;
+using SpellSword.Speech;
 
 namespace SpellSword.Engine
 {
@@ -33,14 +34,25 @@ namespace SpellSword.Engine
 
             foreach (IGameObject gameObject in Map.GetObjects(message.NewPos))
             {
+                if (gameObject.GetComponent<DecalComponent>() is DecalComponent decalComponent && decalComponent.Decal != null)
+                {
+                    if (!first)
+                    {
+                        builder.Append($" {decalComponent.Decal.Title.Preposition} ");
+                    }
+
+                    builder.Append(decalComponent.Decal.Title.Article.WithTrailingSpace() + decalComponent.Decal.Title.Name);
+                    first = false;
+                }
+
                 if (gameObject.GetComponent<NameComponent>() is NameComponent nameComponent)
                 {
                     if (!first)
                     {
-                        builder.Append(" on ");
+                        builder.Append($" {nameComponent.Title.Preposition} ");
                     }
 
-                    builder.Append(nameComponent.Name);
+                    builder.Append(nameComponent.Title.Article.WithTrailingSpace() + nameComponent.Title.Name);
                     first = false;
                 }
             }
