@@ -9,9 +9,12 @@ namespace SpellSword.Engine
     {
         public IGameObject GameObject { get; }
 
-        public SpawnEvent(IGameObject gameObject)
+        public bool Tumble { get; }
+
+        public SpawnEvent(IGameObject gameObject, bool tumble = false)
         {
             GameObject = gameObject;
+            Tumble = tumble;
         }
     }
 }
