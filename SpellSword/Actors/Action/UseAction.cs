@@ -11,8 +11,8 @@ namespace SpellSword.Actors.Action
 {
     class UseAction: ActorAction
     {
-        private Coord _target;
-        private IUsable _usable;
+        private readonly Coord _target;
+        private readonly IUsable _usable;
 
         public UseAction(Actor actor, Coord target, IUsable usable) : base(actor, new EventTimer(usable.UseTiming(actor)))
         {
