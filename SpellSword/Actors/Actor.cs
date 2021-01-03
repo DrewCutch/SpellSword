@@ -8,6 +8,7 @@ using SpellSword.Engine.Components;
 using SpellSword.Logging;
 using SpellSword.Render;
 using SpellSword.Render.Particles;
+using SpellSword.RPG.Items;
 using SpellSword.Update;
 
 namespace SpellSword.Actors
@@ -43,10 +44,14 @@ namespace SpellSword.Actors
             _alive = false;
             Parent.CurrentMap.RemoveEntity(Parent);
 
-            GameObject corpse = new GameObject(Parent.Position, Layers.Floor, null, true);
-            corpse.AddComponent(new GlyphComponent(Parent.GetComponent<GlyphComponent>().Glyph));
+            IGameObject corpse = Create.Corpse(this);
+            MainBus.Send(new SpawnEvent(corpse, true));
 
-            MainBus.Send(new SpawnEvent(corpse));
+            foreach (Item item in Being.Equipment.Equipped.Values)
+            {
+                MainBus.Send(new SpawnEvent(Create.Item(item, corpse.Position), true));
+            }
+
         }
 
         public bool ReadyToAct() => currentAction == null;
