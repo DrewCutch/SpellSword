@@ -10,20 +10,20 @@ using SpellSword.Logging;
 using SpellSword.Render;
 using SpellSword.Render.Particles;
 using SpellSword.RPG;
+using SpellSword.RPG.Items;
 using SpellSword.Time;
 
 namespace SpellSword.Actors.Action
 {
-    class MeleeWeapon: IUsable, IEquippable
+    class MeleeWeapon: Item, IUsable
     {
         public EquipmentSlotKind SlotKind => EquipmentSlotKind.Hand;
-        public string Name => "sword";
 
         public int Range { get; }
         public Distance RangeDistanceType => Distance.MANHATTAN;
         private Damage _damage { get; }
 
-        public MeleeWeapon(Damage damage, int range = 1)
+        public MeleeWeapon(Damage damage, int range = 1) : base("sword", "a dull blade", new Glyph('|', Color.Silver), EquipmentSlotKind.Hand, 1)
         {
             _damage = damage;
             Range = range;
