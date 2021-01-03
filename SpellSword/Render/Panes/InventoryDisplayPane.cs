@@ -35,7 +35,7 @@ namespace SpellSword.Render.Panes
 
             foreach (EquipmentSlot equipmentSlot in EquipmentSlotSet.Slots)
             {
-                Coord lineEnd = StringPrinter.Print($"{equipmentSlot.Name}: {EquipmentSlotSet.Equipped.GetValueOrDefault(equipmentSlot)?.Name ?? "Nothing"}", writeContext, nextMessage.X, nextMessage.Y); 
+                Coord lineEnd = StringPrinter.Print($"{equipmentSlot.Name}: {EquipmentSlotSet.Equipped.GetValueOrDefault(equipmentSlot)?.Title.Name ?? "Nothing"}", writeContext, nextMessage.X, nextMessage.Y); 
 
                 nextMessage = new Coord(0, lineEnd.Y + 1);
             }
