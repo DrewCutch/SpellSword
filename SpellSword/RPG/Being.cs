@@ -6,6 +6,7 @@ using SpellSword.Engine.Components;
 using SpellSword.RPG;
 using SpellSword.RPG.Alignment;
 using SpellSword.RPG.Attributes;
+using SpellSword.RPG.Items;
 using SpellSword.Time;
 
 namespace SpellSword
@@ -56,6 +57,8 @@ namespace SpellSword
 
         public EquipmentSlotSet Equipment { get; }
 
+        public Inventory Inventory { get; }
+
         public event Action OnKilled;
 
         public Being(IAttributeSource attributeSource, Alignment alignment, EquipmentSlotSet equipment, int level, string name)
@@ -65,6 +68,8 @@ namespace SpellSword
             Level = level;
             Equipment = equipment;
             Name = name;
+
+            Inventory = new Inventory();
 
             Health = new ResourceMeter(20, 5);
             Health.OnDeplete += OnZeroHealth;
