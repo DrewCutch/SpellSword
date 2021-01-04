@@ -46,6 +46,9 @@ namespace SpellSword.Render.Lighting
                 {
                     litSpaces.Add(space);
 
+                    if(!_transparencyMap.Contains(space))
+                        break;
+
                     if (!_transparencyMap[space])
                         break;
                 }
@@ -56,7 +59,10 @@ namespace SpellSword.Render.Lighting
                 double dist = Distance.EUCLIDEAN.Calculate(litSpace, light.Pos);
                 double sqrDist = Math.Max(dist * dist, .1);
 
-                if(add)
+                if (!map.Contains(litSpace))
+                    continue;
+
+                if (add)
                     map[litSpace].Add(Brightness(light.Color, (int)(light.Brightness / sqrDist)));
                 else
                     map[litSpace].Subtract(Brightness(light.Color, (int)(light.Brightness / sqrDist)));
