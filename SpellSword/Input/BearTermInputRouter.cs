@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Text;
 using BearLib;
 using GoRogue;
+using GoRogue.Messaging;
 
 namespace SpellSword.Input
 {
     class BearTermInputRouter
     {
-        private IInputListener _listener;
+        private readonly IInputListener _listener;
 
         private IInputListener _focus;
 
@@ -29,7 +30,14 @@ namespace SpellSword.Input
 
                 if (input == Terminal.TK_MOUSE_LEFT)
                 {
-                    _focus = _listener.Focus(MousePos());
+                    IInputListener newFocus = _listener.Focus(MousePos());
+
+                    if (newFocus != _focus)
+                    {
+                        _focus.LoseFocus();
+                        _focus = newFocus;
+                    }
+
                     _listener.OnMouseClick(MousePos()); 
                 }
                 else if (input == Terminal.TK_MOUSE_MOVE)

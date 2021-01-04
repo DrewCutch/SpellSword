@@ -18,5 +18,7 @@ namespace SpellSword.Input
         public void OnKeyUp(int keyCode);
 
         public IInputListener Focus(Coord pos);
+
+        public void LoseFocus();
     }
 }

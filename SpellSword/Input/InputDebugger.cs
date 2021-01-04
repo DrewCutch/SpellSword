@@ -33,5 +33,10 @@ namespace SpellSword.Input
             Console.WriteLine("Asked for new focus");
             return this;
         }
+
+        public void LoseFocus()
+        {
+            Console.WriteLine("Lost focus");
+        }
     }
 }

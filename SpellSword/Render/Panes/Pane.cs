@@ -39,5 +39,10 @@ namespace SpellSword.Render.Panes
             HasFocus = true;
             return this;
         }
+
+        public virtual void LoseFocus()
+        {
+            HasFocus = false;
+        }
     }
 }
