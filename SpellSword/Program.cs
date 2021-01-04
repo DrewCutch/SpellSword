@@ -20,6 +20,7 @@ using SpellSword.RPG.Alignment;
 using SpellSword.TestUtils;
 using SpellSword.Time;
 using GlyphComponent = SpellSword.Engine.Components.GlyphComponent;
+using Rectangle = GoRogue.Rectangle;
 
 namespace SpellSword
 {
@@ -86,16 +87,17 @@ namespace SpellSword
             statusBars.AddChild(new FillBarPane(playerBeing.Health, "Health", Color.Red, Color.DarkRed), 1);
             statusBars.AddChild(new FillBarPane(playerBeing.Mana, "Mana", Color.Aqua, Color.DarkBlue), 1);
             statusBars.AddChild(new FillBarPane(playerBeing.Stamina, "Stamina", Color.Yellow, Color.DarkGoldenrod), 1);
-            statusBars.AddChild(new TextPane("Inventory:"), 1);
-            statusBars.AddChild(new InventoryDisplayPane(playerBeing.Equipment), 1);
+            statusBars.AddChild(new InventoryDisplayPane(playerBeing.Equipment, playerBeing.Inventory, joystickConfig), 1);
 
             StackPane root = new StackPane(StackPane.StackDirection.Horizontal);
             root.AddChild(mapAndConsole, 4);
             root.AddChild(statusBars, 1);
 
-            BearTermInputRouter inputRouter = new BearTermInputRouter(mapAndConsole);
+            BearTermInputRouter inputRouter = new BearTermInputRouter(root);
 
-            BearTermRenderer renderer = new BearTermRenderer(root, "window.title='Spell Sword'; window.size=140x40; window.resizeable=true; input.filter=[keyboard+, mouse+, arrows+]");
+            Window rootWindow = new Window(root, new Rectangle(0, 0, 140, 40), 0);
+
+            BearTermRenderer renderer = new BearTermRenderer(rootWindow, "window.title='Spell Sword'; window.size=140x40; window.resizeable=true; input.filter=[keyboard+, mouse+, arrows+]");
             mainBus.RegisterSubscriber(renderer);
 
             GoalMapStore goalMapStore = new GoalMapStore(map);
@@ -112,6 +114,7 @@ namespace SpellSword
             
 
             int lastFrame = Environment.TickCount;
+
             while (true)
             {
                 inputRouter.HandleInput();
