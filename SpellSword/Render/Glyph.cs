@@ -23,11 +23,6 @@ namespace SpellSword.Render
             BackgroundColor = backgroundColor;
         }
 
-        public Glyph MultipliedByColor(Color color)
-        {
-            return new Glyph(Character, Color.Multiply(color), BackgroundColor?.Multiply(color));
-        }
-
         public Glyph(Color color)
         {
             Color = color;
