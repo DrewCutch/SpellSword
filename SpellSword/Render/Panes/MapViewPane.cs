@@ -69,7 +69,10 @@ namespace SpellSword.Render.Panes
 
                     foreach (Glyph glyph in GlyphMapView[x + Offset.X, y + Offset.Y])
                     {
-                        writeContext.WriteGlyph(y, x, glyph.MultipliedByColor(_lightMap[x + Offset.X, y + Offset.Y]));
+                        if(_visibilityMap[x + Offset.X, y + Offset.Y])
+                            writeContext.WriteGlyph(y, x, glyph.MultipliedByColor(_lightMap[x + Offset.X, y + Offset.Y]));
+                        else
+                            writeContext.WriteGlyph(y, x, glyph.BlackAndWhite());
                     }
                 }
 
