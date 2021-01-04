@@ -25,5 +25,12 @@ namespace SpellSword.Render
 
             return Color.FromArgb(r, g, b);
         }
+
+        public static Color GreyScale(this Color color)
+        {
+            int grey = (int)(color.GetBrightness() * 255);
+
+            return Color.FromArgb(color.A, grey, grey, grey);
+        }
     }
 }
