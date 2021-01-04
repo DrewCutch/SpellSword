@@ -33,7 +33,7 @@ namespace SpellSword.Render
                     currentLine += 1;
                     currentChar = 0;
                 }
-                UncheckedWrite(str, currentChar, currentLine, writeable, color);
+                UncheckedWrite(str, currentChar, currentLine, writeable, color, null);
 
                 if(isLink)
                     foreach (Coord pos in Lines.Get(currentChar, currentLine, currentChar + str.Length - 1, currentLine, Lines.Algorithm.BRESENHAM))
@@ -70,7 +70,7 @@ namespace SpellSword.Render
 
             foreach (string zone in colorZones)
             {
-                lastEnd = Print(zone, writeable, inZone ? colors[currentZone] : mainColor, lastEnd.X - 1, lastEnd.Y);
+                lastEnd = Print(zone, writeable, inZone ? colors[currentZone] : mainColor, x: lastEnd.X - 1, y: lastEnd.Y);
 
                 if(inZone)
                     currentZone = (currentZone + 1) % colors.Length;
@@ -83,10 +83,10 @@ namespace SpellSword.Render
 
         public static Coord Print(string str, IWriteable writeable, int x = 0, int y = 0)
         {
-            return Print(str, writeable, Color.White, x, y);
+            return Print(str, writeable, Color.White, null, x, y);
         }
 
-        public static Coord Print(string str, IWriteable writeable, Color color, int x = 0, int y = 0)
+        public static Coord Print(string str, IWriteable writeable, Color color, Color? backgroundColor = null, int x = 0, int y = 0)
         {
             string[] words = str.Split(' ');
             int width = writeable.Width;
@@ -103,18 +103,21 @@ namespace SpellSword.Render
                     currentChar = 0;
                 }
 
-                UncheckedWrite(word, currentChar, currentLine, writeable, color);
-                currentChar += word.Length + 1;
+                UncheckedWrite(word, currentChar, currentLine, writeable, color, backgroundColor);
+                currentChar += word.Length;
+
+                UncheckedWrite(" ", currentChar, currentLine, writeable, color, backgroundColor);
+                currentChar += 1;
             }
 
             return new Coord(currentChar, currentLine);
         }
 
-        private static void UncheckedWrite(string str, int x, int y, IWriteable writeable, Color color)
+        private static void UncheckedWrite(string str, int x, int y, IWriteable writeable, Color textColor, Color? backgroundColor)
         {
             for (int i = 0; i < str.Length; i++)
             {
-                writeable.SetGlyph(y, x + i, new Glyph(str[i], color));
+                writeable.SetGlyph(y, x + i, new Glyph(str[i], textColor, backgroundColor));
             }
         }
     }
