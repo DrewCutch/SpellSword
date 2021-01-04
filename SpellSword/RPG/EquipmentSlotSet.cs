@@ -47,20 +47,26 @@ namespace SpellSword.RPG
             return null;
         }
 
-        public bool Equip(Item equippable, EquipmentSlot slot)
+        public Item Equip(Item equippable, EquipmentSlot slot)
         {
-            if (equippable.SlotKind != slot.Kind)
-                return false;
+            if (equippable.SlotKind != slot.Kind || !Slots.Contains(slot))
+                return null;
 
-            if (!Slots.Contains(slot) || SlotsInUse.Contains(slot))
-                return false;
+            Item previousItem = null;
+
+            if (SlotsInUse.Contains(slot))
+                previousItem = _equipped[slot];
+            
 
             _equipped[slot] = equippable;
             SlotsInUse.Add(slot);
 
             OnEquipped?.Invoke(slot, equippable);
 
-            return true;
+            if(previousItem != null)
+                OnUnequipped?.Invoke(slot, previousItem);
+
+            return previousItem;
         }
     }
 }
