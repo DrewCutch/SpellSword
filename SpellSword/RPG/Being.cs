@@ -74,8 +74,8 @@ namespace SpellSword
             Health = new ResourceMeter(20, 5);
             Health.OnDeplete += OnZeroHealth;
 
-            Stamina = new ResourceMeter(20, 5);
-            Mana = new ResourceMeter(20, 5);
+            Stamina = new ResourceMeter(20, 0);
+            Mana = new ResourceMeter(20, 0);
         }
 
         private void OnZeroHealth()
