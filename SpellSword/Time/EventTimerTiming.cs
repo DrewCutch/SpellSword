@@ -6,6 +6,8 @@ namespace SpellSword.Time
 {
     class EventTimerTiming
     {
+        public static EventTimerTiming Instant = new EventTimerTiming(0, 0);
+
         public int Leadup { get; }
         public int Cooldown { get; }
 
