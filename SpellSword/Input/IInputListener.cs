@@ -9,16 +9,16 @@ namespace SpellSword.Input
     {
         public bool HasFocus { get; }
 
-        public void OnMouseClick(Coord pos);
+        public void OnMouseClick(Coord pos) { }
 
-        public void OnMouseMove(Coord last, Coord current);
+        public void OnMouseMove(Coord last, Coord current) { }
 
-        public void OnKeyDown(int keyCode);
+        public void OnKeyDown(int keyCode) { }
 
-        public void OnKeyUp(int keyCode);
+        public void OnKeyUp(int keyCode) { }
 
         public IInputListener Focus(Coord pos);
 
-        public void LoseFocus();
+        public void LoseFocus() { }
     }
 }
