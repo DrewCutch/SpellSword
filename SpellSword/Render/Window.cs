@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Text;
 using BearLib;
-using GoRogue;
 using SpellSword.Input;
 using SpellSword.Render.Panes;
 using SpellSword.Render.Particles;
+using Rectangle = GoRogue.Rectangle;
 
 namespace SpellSword.Render
 {
@@ -15,8 +16,25 @@ namespace SpellSword.Render
         public int ZIndex { get; }
         public bool Dirty { get; private set; }
 
-        private TerminalWritable _writable;
-        private TerminalWritable _particleWritable;
+        private Color _background;
+        public Color Background
+        {
+            get => _background;
+            set
+            {
+                _background = value;
+
+                for (int i = 0; i < _backgroundWritable.Width; i++)
+                    for (int j = 0; j < _backgroundWritable.Height; j++)
+                    {
+                        _backgroundWritable.SetGlyph(j, i, new Glyph(_background));
+                    }
+            }
+        }
+
+        private IWriteable _backgroundWritable;
+        private IWriteable _writable;
+        private IWriteable _particleWritable;
 
         private HashSet<IParticleEffect> _particleEffects;
 
@@ -28,12 +46,15 @@ namespace SpellSword.Render
             Root = root;
             ZIndex = zIndex;
 
-            _writable = new TerminalWritable(bounds.Width, bounds.Height, zIndex * 2);
-            _particleWritable = new TerminalWritable(bounds.Width, bounds.Height, zIndex * 2 + 1);
+            _backgroundWritable = new TextWriteContext(new TerminalWritable(bounds.Width, bounds.Height, zIndex * 3), bounds.Width, bounds.Height, bounds.MinExtentX, bounds.MinExtentY);
+            _writable = new TextWriteContext(new TerminalWritable(bounds.Width, bounds.Height, zIndex * 3 + 1), bounds.Width, bounds.Height, bounds.MinExtentX, bounds.MinExtentY);
+            _particleWritable = new TextWriteContext(new TerminalWritable(bounds.Width, bounds.Height, zIndex * 3 + 2), bounds.Width, bounds.Height, bounds.MinExtentX, bounds.MinExtentY);
 
             _lastFrame = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
             _particleEffects = new HashSet<IParticleEffect>();
             _particleEffectRemoved = false;
+
+            
 
             Dirty = true;
         }
@@ -67,6 +88,13 @@ namespace SpellSword.Render
             _lastFrame = now;
         }
 
+        public void Hide()
+        {
+            _writable.Clear();
+            _backgroundWritable.Clear();
+            _particleWritable.Clear();
+        }
+
         private void PaintParticles()
         {
             ((IWriteable)_particleWritable).Clear();
@@ -82,8 +110,8 @@ namespace SpellSword.Render
 
         public void Clean()
         {
-            _writable.Clean();
-            _particleWritable.Clean();
+            _writable.Dirty = false;
+            _particleWritable.Dirty = false;
             Dirty = false;
         }
 
