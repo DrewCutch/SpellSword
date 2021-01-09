@@ -31,21 +31,27 @@ namespace SpellSword.RPG
             _decayRate = decayRate;
         }
 
-        public void Expend(int value)
+        public bool Expend(int value)
         {
-            CurrentValue -= value;
-            OnValueChanged?.Invoke(CurrentValue + value, CurrentValue);
+            int expended = Math.Min(value, CurrentValue);
 
-            _decayCounter += value;
+            CurrentValue -= expended;
+            OnValueChanged?.Invoke(CurrentValue + expended, CurrentValue);
 
-            CurrentCapacity -= _decayCounter / _decayRate;
+            _decayCounter += expended;
 
-            OnCapacityChanged?.Invoke(CurrentCapacity + _decayCounter / _decayRate, CurrentCapacity);
+            int decay = _decayRate == 0 ? 0 : _decayCounter / _decayRate;
+            CurrentCapacity -= decay;
 
-            _decayCounter %= _decayRate;
+            OnCapacityChanged?.Invoke(CurrentCapacity + decay, CurrentCapacity);
+
+            if(_decayRate != 0) 
+                _decayCounter %= _decayRate;
 
             if(CurrentValue <= 0)
                 OnDeplete?.Invoke();
+
+            return expended == value;
         }
 
         public void Exhaust(int value)
