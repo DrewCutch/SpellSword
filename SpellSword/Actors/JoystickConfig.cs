@@ -16,5 +16,7 @@ namespace SpellSword.Actors
         public int MapLeft { get; set; }
         public int MapRight { get; set; }
 
+        public int Inventory { get; set; }
+        public int Equip { get; set; }
     }
 }
