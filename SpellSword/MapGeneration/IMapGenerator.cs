@@ -8,6 +8,7 @@ namespace SpellSword.MapGeneration
 {
     interface IMapGenerator
     {
-        public Map Generate(int width, int height);
+        public IEnumerable<MapInfo> GenerationSteps(int width, int height);
+        public MapInfo Generate(int width, int height);
     }
 }

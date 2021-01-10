@@ -13,22 +13,35 @@ using GoRogue.Random;
 using SpellSword.Engine;
 using SpellSword.Engine.Components;
 using SpellSword.Render;
+using SpellSword.Render.Lighting;
+using SpellSword.Speech;
 using Rectangle = GoRogue.Rectangle;
 
 namespace SpellSword.MapGeneration
 {
     class BasicGenerator: IMapGenerator
     {
-        public Map Generate(int width, int height)
+        public IEnumerable<MapInfo> GenerationSteps(int width, int height)
         {
-            return new Map(CreateTerrain(width, height), Layers.Effects + 1, Distance.MANHATTAN);
+            return CreateTerrain(width, height);
         }
 
-        private ISettableMapView<IGameObject> CreateTerrain(int width, int height)
+        public MapInfo Generate(int width, int height)
         {
-            ISettableMapView<IGameObject> terrain = new ArrayMap<IGameObject>(width, height);
-                
+            return GenerationSteps(width, height).Last();
+        }
 
+        private IEnumerable<MapInfo> CreateTerrain(int width, int height)
+        {
+            Map map = new Map(width, height, Layers.Effects + 1, Distance.MANHATTAN);
+            LightMap lightMap = new LightMap(width, height, map.TransparencyView);
+
+            MapInfo mapInfo = new MapInfo(map, lightMap);
+
+            ISettableMapView<IGameObject> terrain = new LambdaSettableMapView<IGameObject>(width, height, (pos) => map.GetTerrain(pos),
+                (pos, gameObject) => { gameObject.Position = pos; map.SetTerrain(gameObject);});
+            //ISettableMapView<IGameObject> terrain = new ArrayMap<IGameObject>(width, height);
+            
             List<MapArea> areas = new List<MapArea>();
 
             areas.Add(CreateArea(terrain, new Rectangle(5, 5, 10, 10)));
@@ -45,18 +58,8 @@ namespace SpellSword.MapGeneration
                     continue;
 
                 areas.Add(CreateArea(terrain, roomRect));
+                yield return mapInfo;
             }
-            //MapArea area1 = CreateArea(terrain, new Rectangle(0, 0, 10, 20));
-            //MapArea area2 = CreateArea(terrain, new Rectangle(100, 10, 10, 10));
-
-            /*
-            areas.Sort((a1, a2) => ManMag(a1.Bounds.Center).CompareTo(ManMag(a2.Bounds.Center)));
-            for (int i = 0; i < areas.Count - 2; i++)
-            {
-                CarveTunnel(areas[i], areas[i + 1], terrain);
-                CarveTunnel(areas[i], areas[i + 2], terrain);
-            }
-            */
 
             foreach (MapArea area in areas)
             {
@@ -68,17 +71,21 @@ namespace SpellSword.MapGeneration
                 for (int i = 0; i < 2; i++)
                 {
                     CarveTunnel(area, closest.Skip(i + 1).First(), terrain);
+                    yield return mapInfo;
                 }
             }
 
             //CarveTunnel(area1, area2, terrain);
+            
 
-            return terrain;
-        }
+            foreach (MapArea area in areas)
+            {
+                Decorate(mapInfo, area);
 
-        private static int ManMag(Coord coord)
-        {
-            return coord.X + coord.Y;
+                yield return mapInfo;
+            }
+
+            yield return mapInfo;
         }
 
         private static void CarveTunnel(MapArea a, MapArea b, ISettableMapView<IGameObject> terrain)
@@ -145,11 +152,18 @@ namespace SpellSword.MapGeneration
             return area;
         }
 
+        private void Decorate(MapInfo mapInfo, MapArea area)
+        {
+            AreaDecorator testDecorator = new AreaDecorator();
+
+            testDecorator.Decorate(mapInfo, area);
+        }
+
         private static IGameObject CreateWall(Coord pos)
         {
             IGameObject wall = new GameObject(pos, Layers.Terrain, null, true, false, false);
-            wall.AddComponent(new GlyphComponent(new Glyph(Color.DimGray)));
-            wall.AddComponent(new NameComponent("stone wall"));
+            wall.AddComponent(new GlyphComponent(new Glyph('#', Color.DimGray, Color.DimGray)));
+            wall.AddComponent(new NameComponent(new Title("a", "stone wall")));
 
             return wall;
         }
@@ -162,10 +176,10 @@ namespace SpellSword.MapGeneration
             int color = SingletonRandom.DefaultRNG.Next(160, 170);
             Color tileColor = Color.FromArgb(color, color, color);
 
-            GlyphComponent glyphComponent = new GlyphComponent(new Glyph('█', tileColor, tileColor));
+            GlyphComponent glyphComponent = new GlyphComponent(new Glyph(' ', tileColor, tileColor));
             floor.AddComponent(glyphComponent);
-            floor.AddComponent(new DecalComponent(glyphComponent));
-            floor.AddComponent(new NameComponent("stone floor"));
+            floor.AddComponent(new DecalComponent());
+            floor.AddComponent(new NameComponent(new Title("a", "stone floor")));
 
             return floor;
         }
