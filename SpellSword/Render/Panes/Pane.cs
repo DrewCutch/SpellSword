@@ -9,7 +9,7 @@ namespace SpellSword.Render.Panes
         public int Height { get; protected set; }
         public bool HasFocus { get; private set; }
 
-        public bool Dirty { get; protected set; }
+        public virtual bool Dirty { get; protected set; }
 
         public Pane()
         {
@@ -18,11 +18,13 @@ namespace SpellSword.Render.Panes
         public virtual void SuggestWidth(int width)
         {
             Width = width;
+            Dirty = true;
         }
 
         public virtual void SuggestHeight(int height)
         {
             Height = height;
+            Dirty = true;
         }
 
         public abstract bool Paint(IWriteable writeContext);

@@ -8,6 +8,8 @@ namespace SpellSword.Render
         int Width { get; }
         int Height { get; }
 
+        bool Dirty { get; set; }
+
         void SetGlyph(int row, int col, Glyph glyph);
 
         void WriteGlyph(int row, int col, Glyph glyph);

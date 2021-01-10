@@ -13,7 +13,7 @@ namespace SpellSword.Render
 
         public readonly Glyph[][] Contents;
 
-        public bool Dirty { get; private set; }
+        public bool Dirty { get; set; }
 
         public TextTexture(int width, int height)
         {

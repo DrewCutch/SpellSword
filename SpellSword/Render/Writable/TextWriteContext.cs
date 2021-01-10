@@ -7,6 +7,13 @@ namespace SpellSword.Render
         public int Width { get; }
         public int Height { get; }
 
+        public bool Dirty
+        {
+            get => _writeable.Dirty;
+            set => _writeable.Dirty = Dirty;
+
+        }
+
         private readonly int _colOffset;
         private readonly int _rowOffset;
 

@@ -11,9 +11,8 @@ namespace SpellSword.Render
     {
         public int Width { get; }
         public int Height { get; }
+        public bool Dirty { get; set; }
         public int Layer { get; }
-
-        public bool Dirty { get; private set; }
 
         public TerminalWritable(int width, int height, int layer)
         {
@@ -58,11 +57,6 @@ namespace SpellSword.Render
             Terminal.Put(col, row, glyph.Character);
 
             Dirty = true;
-        }
-
-        public void Clean()
-        {
-            Dirty = false;
         }
     }
 }
