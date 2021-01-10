@@ -25,10 +25,14 @@ namespace SpellSword.Actors.Action
         public Distance RangeDistanceType => Distance.MANHATTAN;
         private Damage _damage { get; }
 
+        private readonly int _stamina;
+
         public MeleeWeapon(Damage damage, int range = 1) : base(new Title("a", "sword"), "a dull blade", new Glyph('|', Color.Silver), EquipmentSlotKind.Hand, 1)
         {
             _damage = damage;
             Range = range;
+
+            _stamina = 5;
         }
 
         public void Use(Actor by, Coord target)
@@ -38,6 +42,7 @@ namespace SpellSword.Actors.Action
             EffectTarget effectTarget = gameObject?.GetComponent<EffectTargetComponent>()?.EffectTarget;
 
             effectTarget?.ApplyEffect(new DamageEffect(_damage));
+            by.Parent.GetComponent<EffectTargetComponent>()?.EffectTarget.ApplyEffect(new StaminaEffect(-_stamina));
 
             if (effectTarget != null)
             {
@@ -56,6 +61,9 @@ namespace SpellSword.Actors.Action
 
         public bool CanUse(Actor by, Coord target)
         {
+            if (by.Being.Stamina.CurrentValue < _stamina)
+                return false;
+
             IGameObject gameObject = by.Parent.CurrentMap.GetObject(target);
 
             Actor actor = gameObject?.GetComponent<Actor>();
