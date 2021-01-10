@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using BearLib;
 using GoRogue;
@@ -30,19 +31,111 @@ namespace SpellSword
     {
         static void Main(string[] args)
         {
+            MapGenerator();
+        }
+
+        private static void MapGenerator()
+        {
+            IMapGenerator generator = new BasicGenerator();
+            IEnumerator<MapInfo> generationSteps = generator.GenerationSteps(120, 40).GetEnumerator();
+            generationSteps.MoveNext();
+
             Timeline timeline = new Timeline();
-            Map map = new BasicGenerator().Generate(120, 30);
+            MapInfo mapInfo = generationSteps.Current;
+            Map map = mapInfo.Map;
             UpdatingGameObject.MainTimeline = timeline;
             MessageBus mainBus = new MessageBus();
             Spawner spawner = new Spawner(map);
-            
+
+            JoystickConfig joystickConfig = new JoystickConfig
+            {
+                DownCode = Terminal.TK_S,
+                LeftCode = Terminal.TK_A,
+                RightCode = Terminal.TK_D,
+                UpCode = Terminal.TK_W,
+                MapUp = Terminal.TK_UP,
+                MapDown = Terminal.TK_DOWN,
+                MapRight = Terminal.TK_RIGHT,
+                MapLeft = Terminal.TK_LEFT,
+                Inventory = Terminal.TK_I,
+                Equip = Terminal.TK_E
+            };
+
+            MapViewPane viewPane = new MapViewPane(map, mapInfo.LightMap, new MessageBus(), joystickConfig, null, false);
+            map.ObjectRemoved += (sender, eventArgs) => viewPane.SetDirty();
+            map.ObjectMoved += (sender, eventArgs) => viewPane.SetDirty();
+            map.ObjectAdded += (sender, eventArgs) => viewPane.SetDirty();
+
+            TextPane descriptionPane = new TextPane("");
+
+            Describer describer = new Describer(descriptionPane, map);
+            mainBus.RegisterSubscriber(describer);
+
+            StackPane mapAndConsole = new StackPane(StackPane.StackDirection.Vertical);
+            mapAndConsole.AddChild(descriptionPane, 1);
+            mapAndConsole.AddChild(viewPane, 1);
+
+            Window rootWindow = new Window(mapAndConsole, new Rectangle(0, 0, 120, 41), 0);
+
+            BearTermRenderer renderer = new BearTermRenderer(rootWindow, "window.title='Spell Sword'; window.size=180x50; window.resizeable=true; input.filter=[keyboard+, mouse+, arrows+]");
+            mainBus.RegisterSubscriber<ParticleEvent>(renderer);
+            mainBus.RegisterSubscriber<WindowEvent>(renderer);
+
+            GameControlConsumer gameControlConsumer = new GameControlConsumer(joystickConfig, mainBus, viewPane);
+
+            BearTermInputRouter inputRouter = new BearTermInputRouter(gameControlConsumer);
+            mainBus.RegisterSubscriber(inputRouter);
+            inputRouter.Handle(WindowEvent.Open(mapAndConsole, new Rectangle(0, 0, 120, 41)));
+
+            Terminal.Refresh();
+
+
+            int lastFrame = Environment.TickCount;
+
+            while (generationSteps.MoveNext())
+            {
+                inputRouter.HandleInput();
+
+                renderer.Refresh();
+
+
+                // Artificially slow generation process
+                while (Environment.TickCount - lastFrame < 100)
+                {
+                }
+
+                lastFrame = Environment.TickCount;
+            }
+
+            Console.ReadKey();
+        }
+
+        private static void StartGame()
+        {
+            Timeline timeline = new Timeline();
+            MapInfo mapInfo = new BasicGenerator().Generate(120, 40);
+            Map map = mapInfo.Map;
+            LightMap lightMap = mapInfo.LightMap;
+
+            UpdatingGameObject.MainTimeline = timeline;
+            MessageBus mainBus = new MessageBus();
+            Spawner spawner = new Spawner(map);
+
             mainBus.RegisterSubscriber(spawner);
 
             JoystickConfig joystickConfig = new JoystickConfig
-                { DownCode = Terminal.TK_S, LeftCode = Terminal.TK_A, RightCode = Terminal.TK_D, UpCode = Terminal.TK_W, 
-                    MapUp = Terminal.TK_UP, MapDown = Terminal.TK_DOWN, MapRight = Terminal.TK_RIGHT, MapLeft = Terminal.TK_LEFT, Inventory = Terminal.TK_I, Equip = Terminal.TK_E};
-
-            LightMap lightMap = new LightMap(120, 30, map.TransparencyView);
+            {
+                DownCode = Terminal.TK_S,
+                LeftCode = Terminal.TK_A,
+                RightCode = Terminal.TK_D,
+                UpCode = Terminal.TK_W,
+                MapUp = Terminal.TK_UP,
+                MapDown = Terminal.TK_DOWN,
+                MapRight = Terminal.TK_RIGHT,
+                MapLeft = Terminal.TK_LEFT,
+                Inventory = Terminal.TK_I,
+                Equip = Terminal.TK_E
+            };
 
             //lightMap.AddLight(new Light(Color.AntiqueWhite, new Coord(1, 1), 15, 5));
             lightMap.AddLight(new Light(Color.Wheat, new Coord(8, 8), 20, 10000));
@@ -88,9 +181,9 @@ namespace SpellSword
 
             StackPane mapAndConsole = new StackPane(StackPane.StackDirection.Vertical);
             mapAndConsole.AddChild(descriptionPane, 1);
-            mapAndConsole.AddChild(viewPane, 4);
+            mapAndConsole.AddChild(viewPane, 5);
             mapAndConsole.AddChild(logPane, 1);
-            
+
             StackPane statusBars = new StackPane(StackPane.StackDirection.Vertical);
             statusBars.AddChild(new FillBarPane(playerBeing.Health, "Health", Color.Red, Color.DarkRed), 1);
             statusBars.AddChild(new FillBarPane(playerBeing.Mana, "Mana", Color.Aqua, Color.DarkBlue), 1);
@@ -100,21 +193,21 @@ namespace SpellSword
             root.AddChild(mapAndConsole, 4);
             root.AddChild(statusBars, 1);
 
-            Window rootWindow = new Window(root, new Rectangle(0, 0, 140, 40), 0);
+            Window rootWindow = new Window(root, new Rectangle(0, 0, 180, 50), 0);
 
-            BearTermRenderer renderer = new BearTermRenderer(rootWindow, "window.title='Spell Sword'; window.size=140x40; window.resizeable=true; input.filter=[keyboard+, mouse+, arrows+]");
+            BearTermRenderer renderer = new BearTermRenderer(rootWindow, "window.title='Spell Sword'; window.size=180x50; window.resizeable=true; input.filter=[keyboard+, mouse+, arrows+]");
             mainBus.RegisterSubscriber<ParticleEvent>(renderer);
             mainBus.RegisterSubscriber<WindowEvent>(renderer);
 
-            WindowRouter windowRouter = new WindowRouter();
-            windowRouter.Handle(WindowEvent.Open(root, new Rectangle(0, 0, 140, 40)));
-            mainBus.RegisterSubscriber(windowRouter);
+            //WindowRouter windowRouter = new WindowRouter();
+            //windowRouter.Handle(WindowEvent.Open(root, new Rectangle(0, 0, 180, 50)));
+            //mainBus.RegisterSubscriber(windowRouter);
 
             GameControlConsumer gameControlConsumer = new GameControlConsumer(joystickConfig, mainBus, viewPane);
 
             BearTermInputRouter inputRouter = new BearTermInputRouter(gameControlConsumer);
             mainBus.RegisterSubscriber(inputRouter);
-            inputRouter.Handle(WindowEvent.Open(root, new Rectangle(0, 0, 140, 40)));
+            inputRouter.Handle(WindowEvent.Open(root, new Rectangle(0, 0, 180, 50)));
 
 
             GoalMapStore goalMapStore = new GoalMapStore(map);
@@ -128,7 +221,7 @@ namespace SpellSword
             map.AddEntity(player);
 
             Terminal.Refresh();
-            
+
 
             int lastFrame = Environment.TickCount;
 
@@ -149,7 +242,7 @@ namespace SpellSword
                     lastFrame = Environment.TickCount;
                 }
             }
-            
+
         }
     }
 }
