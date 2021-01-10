@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using SpellSword.Util.Collections;
 using Troschuetz.Random;
@@ -8,11 +10,7 @@ namespace SpellSword.MapGeneration
 {
     public class WeightedRandomBag<T>: IReadOnlyBag<T>
     {
-        private class Choice
-        {
-            public double AccumulatedWeight;
-            public T Value;
-        }
+        public int Count => _choices.Count;
 
         private List<Choice> _choices;
         private double _accumulatedWeight;
@@ -44,6 +42,24 @@ namespace SpellSword.MapGeneration
 
             return default; //should only happen when there are no entries
         }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            return _choices.Select(choice => choice.Value).GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        private class Choice
+        {
+            public double AccumulatedWeight;
+            public T Value;
+        }
+
+
     }
 
 }
