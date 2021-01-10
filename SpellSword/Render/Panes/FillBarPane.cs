@@ -55,7 +55,7 @@ namespace SpellSword.Render.Panes
 
             writeContext.Clear();
             for (int i = 0; i < cap; i++)
-                writeContext.SetGlyph(0, i, new Glyph(i < Label.Length ? Label[i] : ' ', _fillColor.Inverted(), i <= fill ? _fillColor : _capacityColor));
+                writeContext.SetGlyph(0, i, new Glyph(i < Label.Length ? Label[i] : ' ', _fillColor.Inverted(), i < fill ? _fillColor : _capacityColor));
 
             Dirty = false;
             return true;
