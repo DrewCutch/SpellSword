@@ -16,7 +16,7 @@ namespace SpellSword.Render.Panes
 {
     class MapViewPane: Pane
     {
-        public IMapView<IEnumerable<Glyph>> GlyphMapView { get; }
+        public GlyphRenderTranslationMap GlyphMapView { get; }
 
         private readonly MessageBus _controlBus;
         private readonly LightMap _lightMap;
@@ -42,11 +42,11 @@ namespace SpellSword.Render.Panes
             }
         }
 
-        public MapViewPane(Map map, LightMap lightMap, MessageBus controlBus, JoystickConfig controls, InventoryDisplayPane playerInventoryDisplayPane)
+        public MapViewPane(Map map, LightMap lightMap, MessageBus controlBus, JoystickConfig controls, InventoryDisplayPane playerInventoryDisplayPane, bool useFOV = true)
         {
             GlyphMapView = new GlyphRenderTranslationMap(map);
-            _visibilityMap = map.FOV.BooleanFOV;
-            _exploredMap = map.Explored;
+            _visibilityMap = useFOV ? map.FOV.BooleanFOV : new LambdaMapView<bool>(map.Width, map.Height, (pos) => true);
+            _exploredMap = useFOV ? (IMapView<bool>) map.Explored : new LambdaMapView<bool>(map.Width, map.Height, (pos) => true);
             _lightMap = lightMap;
             _controlBus = controlBus;
             _joystickConfig = controls;
@@ -75,12 +75,12 @@ namespace SpellSword.Render.Panes
                     if (!_exploredMap[x + Offset.X, y + Offset.Y])
                         continue;
 
-                    foreach (Glyph glyph in GlyphMapView[x + Offset.X, y + Offset.Y])
+                    foreach (GlyphRenderTranslationMap.MapGlyph glyph in GlyphMapView[x + Offset.X, y + Offset.Y])
                     {
                         if(_visibilityMap[x + Offset.X, y + Offset.Y])
-                            writeContext.WriteGlyph(y, x, glyph.MultipliedByColor(_lightMap[x + Offset.X, y + Offset.Y]));
+                            writeContext.WriteGlyph(y, x, glyph.SelfLit ? glyph.Glyph : glyph.Glyph.MultipliedByColor(_lightMap[x + Offset.X, y + Offset.Y]));
                         else
-                            writeContext.WriteGlyph(y, x, glyph.BlackAndWhite());
+                            writeContext.WriteGlyph(y, x, glyph.Glyph.BlackAndWhite());
                     }
                 }
 
