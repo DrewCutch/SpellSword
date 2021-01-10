@@ -17,18 +17,22 @@ namespace SpellSword.Engine.Components
     class ItemComponent: Component, IInteractable
     {
         public Item Item { get; }
+
+        public int Amount { get; }
+
         public int Range => 1;
         public Distance RangeDistanceType => Distance.MANHATTAN;
 
-        public ItemComponent(Item item)
+        public ItemComponent(Item item, int amount = 1)
         {
             Item = item;
+            Amount = amount;
         }
 
         public void Interact(Actor by)
         {
             Parent.CurrentMap.RemoveEntity(Parent);
-            by.Being.Inventory.Add(Item);
+            by.Being.Inventory.Add(Item, Amount);
 
             by.MainBus.Send(new LogMessage($"{{0}} picked up {Item.Title.Article.WithTrailingSpace()}{Item.Title.Name}", new LogLink(by.Being.Name, Color.Aquamarine, by)));
         }
