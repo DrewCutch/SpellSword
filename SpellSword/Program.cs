@@ -100,7 +100,7 @@ namespace SpellSword
 
 
                 // Artificially slow generation process
-                while (Environment.TickCount - lastFrame < 100)
+                while (Environment.TickCount - lastFrame < 50)
                 {
                 }
 
