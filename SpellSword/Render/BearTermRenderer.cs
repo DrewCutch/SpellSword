@@ -10,7 +10,7 @@ using SpellSword.Render.Particles;
 
 namespace SpellSword.Render
 {
-    class BearTermRenderer: ISubscriber<ParticleEvent>
+    class BearTermRenderer: ISubscriber<ParticleEvent>, ISubscriber<WindowEvent>
     {
         private Dictionary<Pane, Window> _windows;
         private Pane _root;
@@ -58,10 +58,15 @@ namespace SpellSword.Render
             {
                 Window newWindow = new Window(windowEvent.Root, windowEvent.Bounds, _windows.Count);
 
+                if (windowEvent.BackgroundColor is Color backgroundColor)
+                    newWindow.Background = backgroundColor;
+
                 _windows[windowEvent.Root] = newWindow;
             }
             else
             {
+                Window window = _windows[windowEvent.Root];
+                window.Hide();
                 _windows.Remove(windowEvent.Root);
             }
         }
