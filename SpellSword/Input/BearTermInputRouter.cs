@@ -15,6 +15,7 @@ namespace SpellSword.Input
     {
         //private IInputListener _listener => _windowListeners.Peek();
 
+        private readonly IKeyConsumer _gameControlConsumer;
 
         private OrderedDictionary<PaneBounds, IInputListener> _windowListeners;
 
@@ -22,9 +23,10 @@ namespace SpellSword.Input
 
         private Coord _mouseLast;
 
+        public BearTermInputRouter(IKeyConsumer gameControlConsumer)
         {
-            _listener = listener;
-            _focus = listener;
+            _gameControlConsumer = gameControlConsumer;
+
             _mouseLast = MousePos();
             _windowListeners = new OrderedDictionary<PaneBounds, IInputListener>();
         }
@@ -57,6 +59,9 @@ namespace SpellSword.Input
                 }
                 else if (input < Terminal.TK_MOUSE_LEFT) // All key presses
                 {
+                    if(_gameControlConsumer.Consume(input))
+                        continue;
+
                     if ((input & Terminal.TK_KEY_RELEASED) == Terminal.TK_KEY_RELEASED)
                         _focus.OnKeyUp(input);
                     else
