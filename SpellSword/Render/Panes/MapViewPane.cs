@@ -8,6 +8,7 @@ using GoRogue.GameFramework;
 using GoRogue.MapViews;
 using GoRogue.Messaging;
 using SpellSword.Actors;
+using SpellSword.Engine;
 using SpellSword.Input;
 using SpellSword.Render.Lighting;
 
@@ -22,8 +23,12 @@ namespace SpellSword.Render.Panes
         private readonly IMapView<bool> _visibilityMap;
         private readonly IMapView<bool> _exploredMap;
 
+        private readonly InventoryDisplayPane _playerInventoryDisplayPane;
+
 
         private readonly JoystickConfig _joystickConfig;
+
+        private bool _inventoryOpen;
 
 
         private Coord _offset;
@@ -37,7 +42,7 @@ namespace SpellSword.Render.Panes
             }
         }
 
-        public MapViewPane(Map map, LightMap lightMap, MessageBus controlBus, JoystickConfig controls)
+        public MapViewPane(Map map, LightMap lightMap, MessageBus controlBus, JoystickConfig controls, InventoryDisplayPane playerInventoryDisplayPane)
         {
             GlyphMapView = new GlyphRenderTranslationMap(map);
             _visibilityMap = map.FOV.BooleanFOV;
@@ -45,6 +50,9 @@ namespace SpellSword.Render.Panes
             _lightMap = lightMap;
             _controlBus = controlBus;
             _joystickConfig = controls;
+            _playerInventoryDisplayPane = playerInventoryDisplayPane;
+
+            _inventoryOpen = false;
 
             Dirty = true;
         }
@@ -86,6 +94,20 @@ namespace SpellSword.Render.Panes
             _controlBus.Send(new MouseMoveEvent(last, current));
         }
 
+        public void ToggleInventory()
+        {
+            if (!_inventoryOpen)
+            {
+                _controlBus.Send(WindowEvent.Open(_playerInventoryDisplayPane, new GoRogue.Rectangle(new Coord(Width / 2, Height / 2), Width / 4, Height / 4), Color.DarkGray));
+                _inventoryOpen = true;
+            }
+            else
+            {
+                _controlBus.Send(WindowEvent.Close(_playerInventoryDisplayPane));
+                _inventoryOpen = false;
+            }
+        }
+
         public override void OnKeyDown(int keyCode)
         {
             if (keyCode == _joystickConfig.MapUp)
@@ -93,17 +115,17 @@ namespace SpellSword.Render.Panes
                 Offset += new Coord(0, -1);
                 SetDirty();
             }
-            if (keyCode == _joystickConfig.MapDown)
+            else if (keyCode == _joystickConfig.MapDown)
             {
                 Offset += new Coord(0, 1);
                 SetDirty();
             }
-            if (keyCode == _joystickConfig.MapLeft)
+            else if (keyCode == _joystickConfig.MapLeft)
             {
                 Offset += new Coord(-1, 0);
                 SetDirty();
             }
-            if (keyCode == _joystickConfig.MapRight)
+            else if (keyCode == _joystickConfig.MapRight)
             {
                 Offset += new Coord(1, 0);
                 SetDirty();
