@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using GoRogue.Random;
 using SpellSword.Util.Collections;
 using Troschuetz.Random;
 
@@ -14,11 +15,25 @@ namespace SpellSword.MapGeneration
 
         private List<Choice> _choices;
         private int _accumulatedWeight;
-        private IGenerator _rng;
+        private readonly IGenerator _defaultRng;
 
-        public WeightedRandomBag(IGenerator rng)
+        public WeightedRandomBag():this(SingletonRandom.DefaultRNG)
         {
-            _rng = rng;
+
+        }
+
+        public WeightedRandomBag(IGenerator defaultRng)
+        {
+            _defaultRng = defaultRng;
+            _choices = new List<Choice>();
+        }
+
+        public WeightedRandomBag(IEnumerable<(T, int)> choices, IGenerator rng = null): this()
+        {
+            foreach ((T value, int weight) in choices)
+            {
+                AddChoice(value, weight);
+            }
         }
 
         public void AddChoice(T value, int weight)
@@ -28,11 +43,11 @@ namespace SpellSword.MapGeneration
             _choices.Add(choice);
         }
 
-        public T Get(bool remove = false)
+        public T Get(IGenerator rng, bool remove = false)
         {
-            double r = _rng.NextDouble() * _accumulatedWeight;
+            double r = rng.NextDouble() * _accumulatedWeight;
 
-            foreach(Choice choice in _choices)
+            foreach (Choice choice in _choices)
             {
                 if (choice.AccumulatedWeight >= r)
                 {
@@ -41,6 +56,11 @@ namespace SpellSword.MapGeneration
             }
 
             return default; //should only happen when there are no entries
+        }
+
+        public T Get(bool remove = false)
+        {
+            return Get(_defaultRng, remove);
         }
 
         public IEnumerator<T> GetEnumerator()
@@ -58,8 +78,6 @@ namespace SpellSword.MapGeneration
             public int AccumulatedWeight;
             public T Value;
         }
-
-
     }
 
 }
