@@ -19,6 +19,8 @@ namespace SpellSword.Engine.Components
             {
                 value.Moved += OnMoved;
                 _parent = value;
+
+                _lightMap.AddLight(new Light(_light.Color, Parent.Position, _light.Range, _light.Brightness));
             }
         }
 
