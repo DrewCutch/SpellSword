@@ -23,22 +23,19 @@ namespace SpellSword.MapGeneration
         // (a space that will not be attempted again
         public float DeadChance { get; }
 
-        private IGenerator _rng;
 
+        private Func<MapInfo, Coord, GameObject> _generator;
 
-        private Func<Coord, GameObject> _generator;
-
-        public Spreader(Func<Coord, GameObject> generator, IGenerator rng, int startingEnergy, float spreadChance, float deadChance)
+        public Spreader(Func<MapInfo, Coord, GameObject> generator, int startingEnergy, float spreadChance, float deadChance)
         {
             _generator = generator;
-            _rng = rng;
 
             StartingEnergy = startingEnergy;
             SpreadChance = spreadChance;
             DeadChance = deadChance;
         }
 
-        public bool Place(Map map, Coord pos)
+        public bool Place(MapInfo mapInfo, Coord pos, IGenerator rng)
         {
             int energy = StartingEnergy;
 
@@ -52,20 +49,20 @@ namespace SpellSword.MapGeneration
                 Coord next = frontier.Dequeue();
                 explored.Add(next);
 
-                if (_rng.NextDouble() > SpreadChance)
+                if (rng.NextDouble() > SpreadChance)
                 {
                     energy--;
 
-                    if (_rng.NextDouble() < DeadChance)
+                    if (rng.NextDouble() < DeadChance)
                         explored.Add(next);
                     //frontier.Enqueue(next);
 
                     continue;
                 }
 
-                GameObject obj = _generator(next);
+                GameObject obj = _generator(mapInfo, next);
 
-                if (!map.IsWalkable(next) || !map.AddEntity(obj)) 
+                if (!mapInfo.Map.IsWalkable(next) || !mapInfo.Map.AddEntity(obj)) 
                     continue;
 
 
