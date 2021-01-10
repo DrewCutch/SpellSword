@@ -13,7 +13,7 @@ namespace SpellSword.MapGeneration
         public int Count => _choices.Count;
 
         private List<Choice> _choices;
-        private double _accumulatedWeight;
+        private int _accumulatedWeight;
         private IGenerator _rng;
 
         public WeightedRandomBag(IGenerator rng)
@@ -21,7 +21,7 @@ namespace SpellSword.MapGeneration
             _rng = rng;
         }
 
-        public void AddChoice(T value, float weight)
+        public void AddChoice(T value, int weight)
         {
             _accumulatedWeight += weight;
             Choice choice = new Choice() {AccumulatedWeight = _accumulatedWeight, Value = value};
@@ -55,7 +55,7 @@ namespace SpellSword.MapGeneration
 
         private class Choice
         {
-            public double AccumulatedWeight;
+            public int AccumulatedWeight;
             public T Value;
         }
 
