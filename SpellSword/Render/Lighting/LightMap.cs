@@ -19,7 +19,7 @@ namespace SpellSword.Render.Lighting
             {
                 for (int j = 0; j < map.Height; j++)
                 {
-                    map[i, j] = Color.FromArgb(80, 80, 80);
+                    map[i, j] = Color.FromArgb(50, 50, 50);
                 }
             }
         }
@@ -46,6 +46,10 @@ namespace SpellSword.Render.Lighting
                 {
                     litSpaces.Add(space);
 
+                    // Don't let a light block itself
+                    if(space == light.Pos)
+                        continue;
+
                     if(!_transparencyMap.Contains(space))
                         break;
 
@@ -57,15 +61,15 @@ namespace SpellSword.Render.Lighting
             foreach (Coord litSpace in litSpaces)
             {
                 double dist = Distance.EUCLIDEAN.Calculate(litSpace, light.Pos);
-                double sqrDist = Math.Max(dist * dist, .1);
+                double sqrDist = Math.Max(dist, .1); ; //Math.Max(dist * dist, .1);
 
                 if (!map.Contains(litSpace))
                     continue;
 
                 if (add)
-                    map[litSpace].Add(Brightness(light.Color, (int)(light.Brightness / sqrDist)));
+                    map[litSpace].Add(Brightness(light.Color, (int)(light.Brightness - sqrDist)));
                 else
-                    map[litSpace].Subtract(Brightness(light.Color, (int)(light.Brightness / sqrDist)));
+                    map[litSpace].Subtract(Brightness(light.Color, (int)(light.Brightness - sqrDist)));
             }
         }
 
