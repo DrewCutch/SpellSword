@@ -53,6 +53,11 @@ namespace SpellSword.Actors
                 MainBus.Send(new SpawnEvent(Create.Item(item, corpse.Position), true));
             }
 
+            foreach (Item item in Being.Inventory.Items.Keys)
+            {
+                MainBus.Send(new SpawnEvent(Create.Item(item, Being.Inventory.Items[item], corpse.Position), true));
+            }
+
         }
 
         public bool ReadyToAct() => currentAction == null;
