@@ -54,7 +54,7 @@ namespace SpellSword.Input
                 }
                 else if (input == Terminal.TK_MOUSE_MOVE)
                 {
-                    _windowListeners.Values.Last().OnMouseMove(_mouseLast, MousePos());
+                    _windowListeners.Keys.Last().Pane.OnMouseMove(_mouseLast, MousePos());
                     _mouseLast = MousePos();
                 }
                 else if (input < Terminal.TK_MOUSE_LEFT) // All key presses
