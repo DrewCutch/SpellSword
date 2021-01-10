@@ -6,6 +6,7 @@ using GoRogue.GameFramework;
 using GoRogue.Messaging;
 using SpellSword.Actors;
 using SpellSword.Actors.Action;
+using SpellSword.Actors.Effects;
 using SpellSword.Actors.Pathing;
 using SpellSword.Engine;
 using SpellSword.Engine.Components;
@@ -15,6 +16,7 @@ using SpellSword.MapGeneration;
 using SpellSword.Render;
 using SpellSword.Render.Lighting;
 using SpellSword.Render.Panes;
+using SpellSword.Render.Particles;
 using SpellSword.RPG;
 using SpellSword.RPG.Alignment;
 using SpellSword.TestUtils;
@@ -38,7 +40,7 @@ namespace SpellSword
 
             JoystickConfig joystickConfig = new JoystickConfig
                 { DownCode = Terminal.TK_S, LeftCode = Terminal.TK_A, RightCode = Terminal.TK_D, UpCode = Terminal.TK_W, 
-                    MapUp = Terminal.TK_UP, MapDown = Terminal.TK_DOWN, MapRight = Terminal.TK_RIGHT, MapLeft = Terminal.TK_LEFT};
+                    MapUp = Terminal.TK_UP, MapDown = Terminal.TK_DOWN, MapRight = Terminal.TK_RIGHT, MapLeft = Terminal.TK_LEFT, Inventory = Terminal.TK_I, Equip = Terminal.TK_E};
 
             LightMap lightMap = new LightMap(120, 30, map.TransparencyView);
 
@@ -62,10 +64,16 @@ namespace SpellSword
             player.AddComponent(new LightSourceComponent(lightMap, new Light(Color.Aqua, Coord.NONE, 6, 100)));
             player.AddComponent(new FOVExplorerComponent());
 
+            EffectTargetComponent playerEffectTarget = new EffectTargetComponent();
+            playerEffectTarget.EffectTarget.AddEffectReceiver(playerActor);
+            player.AddComponent(playerEffectTarget);
+
+            playerEffectTarget.EffectTarget.ApplyEffect(new StaminaEffect(1, EffectKind.Repeating, new EventTimerTiming(25, 25)));
+
             Logger logger = new Logger();
             mainBus.RegisterSubscriber(logger);
 
-            MapViewPane viewPane = new MapViewPane(map, lightMap, mainBus, joystickConfig);
+            MapViewPane viewPane = new MapViewPane(map, lightMap, mainBus, joystickConfig, new InventoryDisplayPane(playerBeing.Equipment, playerBeing.Inventory, joystickConfig, mainBus));
             map.ObjectRemoved += (sender, eventArgs) => viewPane.SetDirty();
             map.ObjectMoved += (sender, eventArgs) => viewPane.SetDirty();
             map.ObjectAdded += (sender, eventArgs) => viewPane.SetDirty();
@@ -87,18 +95,27 @@ namespace SpellSword
             statusBars.AddChild(new FillBarPane(playerBeing.Health, "Health", Color.Red, Color.DarkRed), 1);
             statusBars.AddChild(new FillBarPane(playerBeing.Mana, "Mana", Color.Aqua, Color.DarkBlue), 1);
             statusBars.AddChild(new FillBarPane(playerBeing.Stamina, "Stamina", Color.Yellow, Color.DarkGoldenrod), 1);
-            statusBars.AddChild(new InventoryDisplayPane(playerBeing.Equipment, playerBeing.Inventory, joystickConfig), 1);
 
             StackPane root = new StackPane(StackPane.StackDirection.Horizontal);
             root.AddChild(mapAndConsole, 4);
             root.AddChild(statusBars, 1);
 
-            BearTermInputRouter inputRouter = new BearTermInputRouter(root);
-
             Window rootWindow = new Window(root, new Rectangle(0, 0, 140, 40), 0);
 
             BearTermRenderer renderer = new BearTermRenderer(rootWindow, "window.title='Spell Sword'; window.size=140x40; window.resizeable=true; input.filter=[keyboard+, mouse+, arrows+]");
-            mainBus.RegisterSubscriber(renderer);
+            mainBus.RegisterSubscriber<ParticleEvent>(renderer);
+            mainBus.RegisterSubscriber<WindowEvent>(renderer);
+
+            WindowRouter windowRouter = new WindowRouter();
+            windowRouter.Handle(WindowEvent.Open(root, new Rectangle(0, 0, 140, 40)));
+            mainBus.RegisterSubscriber(windowRouter);
+
+            GameControlConsumer gameControlConsumer = new GameControlConsumer(joystickConfig, mainBus, viewPane);
+
+            BearTermInputRouter inputRouter = new BearTermInputRouter(gameControlConsumer);
+            mainBus.RegisterSubscriber(inputRouter);
+            inputRouter.Handle(WindowEvent.Open(root, new Rectangle(0, 0, 140, 40)));
+
 
             GoalMapStore goalMapStore = new GoalMapStore(map);
 
