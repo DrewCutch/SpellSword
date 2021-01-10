@@ -12,6 +12,7 @@ using GoRogue.Pathing;
 using GoRogue.Random;
 using SpellSword.Engine;
 using SpellSword.Engine.Components;
+using SpellSword.MapGeneration.Resources;
 using SpellSword.Render;
 using SpellSword.Render.Lighting;
 using SpellSword.Speech;
@@ -21,6 +22,9 @@ namespace SpellSword.MapGeneration
 {
     class BasicGenerator: IMapGenerator
     {
+
+        private IBiome _biome = Biomes.TestBiome;
+
         public IEnumerable<MapInfo> GenerationSteps(int width, int height)
         {
             return CreateTerrain(width, height);
@@ -80,8 +84,7 @@ namespace SpellSword.MapGeneration
 
             foreach (MapArea area in areas)
             {
-                Decorate(mapInfo, area);
-
+                _biome.Populate(mapInfo, area, SingletonRandom.DefaultRNG);
                 yield return mapInfo;
             }
 
@@ -150,13 +153,6 @@ namespace SpellSword.MapGeneration
             area.Add(new Rectangle(dimensions.MinExtent + new Coord(1, 1), dimensions.MaxExtent - new Coord(1, 1)).Positions());
 
             return area;
-        }
-
-        private void Decorate(MapInfo mapInfo, MapArea area)
-        {
-            AreaDecorator testDecorator = new AreaDecorator();
-
-            testDecorator.Decorate(mapInfo, area);
         }
 
         private static IGameObject CreateWall(Coord pos)
