@@ -23,8 +23,13 @@ namespace SpellSword.Engine
 
         public static IGameObject Item(Item item, Coord position)
         {
+            return Item(item, 1, position);
+        }
+
+        public static IGameObject Item(Item item, int amount, Coord position)
+        {
             GameObject itemObject = new GameObject(position, Layers.Floor, null, false);
-            itemObject.AddComponent(new ItemComponent(item));
+            itemObject.AddComponent(new ItemComponent(item, amount));
             itemObject.AddComponent(new GlyphComponent(item.Glyph));
             itemObject.AddComponent(new NameComponent(item.Title));
 
