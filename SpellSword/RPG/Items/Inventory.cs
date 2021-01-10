@@ -39,6 +39,9 @@ namespace SpellSword.RPG.Items
         {
             _items[item] -= amount;
 
+            if (_items[item] == 0)
+                _items.Remove(item);
+
             OnRemove?.Invoke(item);
         }
     }
