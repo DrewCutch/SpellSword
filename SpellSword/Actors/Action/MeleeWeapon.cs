@@ -5,6 +5,7 @@ using System.Net;
 using System.Text;
 using GoRogue;
 using GoRogue.GameFramework;
+using SpellSword.Actors.Effects;
 using SpellSword.Engine.Components;
 using SpellSword.Logging;
 using SpellSword.Render;
@@ -34,11 +35,11 @@ namespace SpellSword.Actors.Action
         {
             IGameObject gameObject = by.Parent.CurrentMap.GetObject(target);
 
-            IDamagable damagable = gameObject?.GetComponent<IDamagable>();
+            EffectTarget effectTarget = gameObject?.GetComponent<EffectTargetComponent>()?.EffectTarget;
 
-            damagable?.DoDamage(_damage);
+            effectTarget?.ApplyEffect(new DamageEffect(_damage));
 
-            if (damagable != null)
+            if (effectTarget != null)
             {
                 by.MainBus.Send(new ParticleEvent(new GlyphFlash(new Glyph('/', Color.Red), 200,
                     target)));
