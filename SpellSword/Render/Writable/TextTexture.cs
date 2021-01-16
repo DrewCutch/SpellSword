@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using GoRogue.MapViews;
 using SpellSword.Actors.Action;
+using Rectangle = GoRogue.Rectangle;
 
 namespace SpellSword.Render
 {
@@ -31,6 +32,13 @@ namespace SpellSword.Render
         public void WriteGlyph(int row, int col, Glyph glyph)
         {
             SetGlyph(row, col, glyph);
+        }
+
+        public void Clear(Rectangle bounds)
+        {
+            for (int i = bounds.MinExtentY; i < bounds.MaxExtentY; i++)
+                for (int j = bounds.MinExtentX; j < bounds.MaxExtentX; j++)
+                    SetGlyph(i, j, Glyph.Blank);
         }
 
         public void SetGlyph(int row, int col, Glyph g)

@@ -1,4 +1,5 @@
 ﻿using System;
+using GoRogue;
 
 namespace SpellSword.Render
 {
@@ -62,6 +63,11 @@ namespace SpellSword.Render
                 throw new ArgumentOutOfRangeException(nameof(col));
 
             _writeable.WriteGlyph(_rowOffset + row, _colOffset + col, g);
+        }
+
+        public void Clear(Rectangle bounds)
+        {
+            _writeable.Clear(bounds.Translate(_colOffset, _rowOffset));
         }
     }
 }

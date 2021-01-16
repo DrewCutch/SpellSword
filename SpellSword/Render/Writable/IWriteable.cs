@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using GoRogue;
 
 namespace SpellSword.Render
 {
@@ -16,9 +17,9 @@ namespace SpellSword.Render
 
         public void Clear()
         {
-            for (int i = 0; i < Height; i++)
-                for (int j = 0; j < Width; j++)
-                    SetGlyph(i, j, Glyph.Blank);
+            Clear(new Rectangle(0,0,Width, Height));
         }
+
+        public void Clear(Rectangle bounds);
     }
 }

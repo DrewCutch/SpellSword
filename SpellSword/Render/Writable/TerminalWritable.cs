@@ -58,5 +58,11 @@ namespace SpellSword.Render
 
             Dirty = true;
         }
+
+        public void Clear(GoRogue.Rectangle bounds)
+        {
+            Terminal.Layer(Layer);
+            Terminal.ClearArea(bounds);
+        }
     }
 }
