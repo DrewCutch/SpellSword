@@ -9,23 +9,30 @@ namespace SpellSword.Engine.Components
 {
     class UpdatingGameObject: GameObject
     {
-        public static Timeline MainTimeline { get; set; }
-        
+
         private event Action<int> OnUpdate;
 
-        public static UpdatingGameObject CreateUpdatingGameObject(Coord position, int layer, IGameObject parentObject, bool isStatic = false, bool isWalkable = true, bool isTransparent = true)
+        private Timeline _timeline;
+
+        public Timeline Timeline
         {
-            return new UpdatingGameObject(position, layer, parentObject, MainTimeline, isStatic, isWalkable, isTransparent);
+            get => _timeline;
+            set
+            {
+                if (value == _timeline)
+                    return;
+
+                if(_timeline != null)
+                    _timeline.OnAdvance -= OnAdvance;
+
+                _timeline = value;
+                _timeline.OnAdvance += OnAdvance;
+            }
         }
 
         public UpdatingGameObject(Coord position, int layer, IGameObject parentObject, Timeline timeline, bool isStatic = false, bool isWalkable = true, bool isTransparent = true) : base(position, layer, parentObject, isStatic, isWalkable, isTransparent)
         {
-            timeline.OnAdvance += OnAdvance;
-        }
-
-        public UpdatingGameObject(Coord position, int layer, IGameObject parentObject, bool isStatic = false, bool isWalkable = true, bool isTransparent = true) : base(position, layer, parentObject, isStatic, isWalkable, isTransparent)
-        {
-            MainTimeline.OnAdvance += OnAdvance;
+            Timeline = timeline;
         }
 
         private void OnAdvance(int ticks)

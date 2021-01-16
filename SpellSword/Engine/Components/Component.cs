@@ -9,6 +9,8 @@ namespace SpellSword.Engine.Components
     abstract class Component: IGameObjectComponent
     {
         public virtual IGameObject Parent { get; set; }
+
+        public UpdatingGameObject GameObject => (UpdatingGameObject) Parent;
         
         public virtual Component CloneTo(IGameObject gameObject)
         {

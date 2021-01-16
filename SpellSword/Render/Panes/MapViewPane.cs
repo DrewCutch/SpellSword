@@ -16,12 +16,38 @@ namespace SpellSword.Render.Panes
 {
     class MapViewPane: Pane
     {
-        public GlyphRenderTranslationMap GlyphMapView { get; }
+        public GlyphRenderTranslationMap GlyphMapView { get; protected set; }
+
+        private Map _map;
+        public Map Map
+        {
+            get => _map;
+            set
+            {
+                _map = value;
+                _visibilityMap = UseFOV ? _map.FOV.BooleanFOV : new LambdaMapView<bool>(_map.Width, _map.Height, (pos) => true);
+                _exploredMap = UseFOV ? (IMapView<bool>)_map.Explored : new LambdaMapView<bool>(_map.Width, _map.Height, (pos) => true);
+                GlyphMapView = new GlyphRenderTranslationMap(_map);
+                Dirty = true;
+            }
+        }
 
         private readonly MessageBus _controlBus;
-        private readonly LightMap _lightMap;
-        private readonly IMapView<bool> _visibilityMap;
-        private readonly IMapView<bool> _exploredMap;
+        private LightMap _lightMap;
+        public LightMap LightMap
+        {
+            get => _lightMap;
+            set
+            {
+                _lightMap = value;
+                Dirty = true;
+            }
+        }
+
+        public bool UseFOV { get; }
+
+        private IMapView<bool> _visibilityMap;
+        private IMapView<bool> _exploredMap;
 
         private readonly InventoryDisplayPane _playerInventoryDisplayPane;
 
@@ -42,12 +68,10 @@ namespace SpellSword.Render.Panes
             }
         }
 
-        public MapViewPane(Map map, LightMap lightMap, MessageBus controlBus, JoystickConfig controls, InventoryDisplayPane playerInventoryDisplayPane, bool useFOV = true)
+        public MapViewPane(MessageBus controlBus, JoystickConfig controls, InventoryDisplayPane playerInventoryDisplayPane, bool useFOV = true)
         {
-            GlyphMapView = new GlyphRenderTranslationMap(map);
-            _visibilityMap = useFOV ? map.FOV.BooleanFOV : new LambdaMapView<bool>(map.Width, map.Height, (pos) => true);
-            _exploredMap = useFOV ? (IMapView<bool>) map.Explored : new LambdaMapView<bool>(map.Width, map.Height, (pos) => true);
-            _lightMap = lightMap;
+            UseFOV = useFOV;
+
             _controlBus = controlBus;
             _joystickConfig = controls;
             _playerInventoryDisplayPane = playerInventoryDisplayPane;
@@ -64,7 +88,7 @@ namespace SpellSword.Render.Panes
 
         public override bool Paint(IWriteable writeContext)
         {
-            if (!Dirty)
+            if (!Dirty || _map == null)
                 return false;
 
             writeContext.Clear();
@@ -80,7 +104,7 @@ namespace SpellSword.Render.Panes
                         if(_visibilityMap[x + Offset.X, y + Offset.Y])
                             writeContext.WriteGlyph(y, x, glyph.SelfLit ? glyph.Glyph : glyph.Glyph.MultipliedByColor(_lightMap[x + Offset.X, y + Offset.Y]));
                         else
-                            writeContext.WriteGlyph(y, x, glyph.Glyph.BlackAndWhite());
+                            writeContext.WriteGlyph(y, x, glyph.Glyph.MultipliedByColor(Color.FromArgb(50, 50, 50)));
                     }
                 }
 

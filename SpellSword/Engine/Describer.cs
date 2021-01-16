@@ -13,14 +13,13 @@ namespace SpellSword.Engine
 {
     class Describer : ISubscriber<MouseMoveEvent>
     {
-        public Map Map { get; }
+        public Map Map { get; set; }
 
         private readonly TextPane _descriptionPane;
 
-        public Describer(TextPane descriptionPane, Map map)
+        public Describer(TextPane descriptionPane)
         {
             _descriptionPane = descriptionPane;
-            Map = map;
         }
 
         public void Handle(MouseMoveEvent message)

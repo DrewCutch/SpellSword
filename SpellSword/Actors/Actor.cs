@@ -14,9 +14,9 @@ using SpellSword.Update;
 
 namespace SpellSword.Actors
 {
-    class Actor: IGameObjectComponent, IUpdate, IDamagable, ILinkable
+    class Actor: Component, IUpdate, IDamagable, ILinkable
     { 
-        public IGameObject Parent { get; set; }
+        public override IGameObject Parent { get; set; }
 
         private ActorAction currentAction;
         public Being Being { get; }

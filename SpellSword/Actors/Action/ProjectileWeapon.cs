@@ -29,7 +29,7 @@ namespace SpellSword.Actors.Action
         {
             Direction fireDirection = Direction.GetDirection(by.Parent.Position, target);
 
-            GameObject projectile = new UpdatingGameObject(by.Parent.Position + fireDirection, Layers.Main, null);
+            GameObject projectile = new UpdatingGameObject(by.Parent.Position + fireDirection, Layers.Main, null, by.GameObject.Timeline);
             projectile.AddComponent(new GlyphComponent(new Glyph('.', Color.Black)));
 
             ProjectileComponent projectileComponent =

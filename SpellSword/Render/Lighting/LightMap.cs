@@ -9,9 +9,9 @@ namespace SpellSword.Render.Lighting
 {
     class LightMap : IMapView<Color> {
         private ArrayMap2D<UnboundedColor> map;
-        private IMapView<Boolean> _transparencyMap;
+        private IMapView<bool> _transparencyMap;
 
-        public LightMap(int width, int height, IMapView<Boolean> transparencyMap)
+        public LightMap(int width, int height, IMapView<bool> transparencyMap)
         {
             map = new ArrayMap2D<UnboundedColor>(width, height);
             _transparencyMap = transparencyMap;
@@ -37,29 +37,19 @@ namespace SpellSword.Render.Lighting
 
         private void ModifyLight(Light light, bool add)
         {
-            HashSet<Coord> litSpaces = new HashSet<Coord>();
+            //HashSet<Coord> litSpaces = new HashSet<Coord>();
 
-            Rectangle limit = new Rectangle(light.Pos, light.Range, light.Range);
-            foreach (Coord farthest in limit.PerimeterPositions())
-            {
-                foreach (Coord space in Lines.Get(light.Pos, farthest, Lines.Algorithm.DDA))
-                {
-                    litSpaces.Add(space);
+            if (!_transparencyMap.Contains(light.Pos))
+                return;
 
-                    // Don't let a light block itself
-                    if(space == light.Pos)
-                        continue;
-
-                    if(!_transparencyMap.Contains(space))
-                        break;
-
-                    if (!_transparencyMap[space])
-                        break;
-                }
-            }
+            FOV litFov = new FOV(_transparencyMap);
+            litFov.Calculate(light.Pos, light.Range);
+            IEnumerable<Coord> litSpaces = litFov.CurrentFOV;
 
             foreach (Coord litSpace in litSpaces)
             {
+                //double falloff = litFov[litSpace];
+
                 double dist = Distance.EUCLIDEAN.Calculate(litSpace, light.Pos);
                 double sqrDist = Math.Max(dist, .1); ; //Math.Max(dist * dist, .1);
 

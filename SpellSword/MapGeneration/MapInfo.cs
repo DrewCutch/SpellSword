@@ -11,6 +11,10 @@ namespace SpellSword.MapGeneration
         public Map Map { get; }
         public LightMap LightMap { get; }
 
+        public IGameObject Entrance { get; }
+
+        public IGameObject Exit { get; }
+
         public MapInfo(Map map, LightMap lightMap)
         {
             Map = map;
