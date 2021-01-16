@@ -20,7 +20,7 @@ namespace SpellSword.Engine.Components
                 value.Moved += OnMoved;
                 _parent = value;
 
-                _lightMap.AddLight(new Light(_light.Color, Parent.Position, _light.Range, _light.Brightness));
+                _lightMap.AddLight(new Light(_light.Color, Parent.Position + _light.Pos, _light.Range, _light.Brightness));
             }
         }
 
@@ -37,7 +37,7 @@ namespace SpellSword.Engine.Components
         private void OnMoved(object sender, ItemMovedEventArgs<IGameObject> e)
         {
             _lightMap.RemoveLight(_light);
-            _light = new Light(_light.Color, Parent.Position, _light.Range, _light.Brightness);
+            _light = new Light(_light.Color, Parent.Position + _light.Pos, _light.Range, _light.Brightness);
             _lightMap.AddLight(_light);
         }
     }
