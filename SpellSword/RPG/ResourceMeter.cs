@@ -35,7 +35,11 @@ namespace SpellSword.RPG
         {
             int expended = Math.Min(value, CurrentValue);
 
+            if (expended == 0 )
+                return CurrentValue == 0;
+
             CurrentValue -= expended;
+
             OnValueChanged?.Invoke(CurrentValue + expended, CurrentValue);
 
             _decayCounter += expended;
@@ -65,6 +69,9 @@ namespace SpellSword.RPG
 
         public void Charge(int value)
         {
+            if (CurrentValue == CurrentCapacity)
+                return;
+
             CurrentValue = Math.Min(CurrentValue + value, CurrentCapacity);
             OnValueChanged?.Invoke(CurrentValue - value, CurrentValue);
         }
