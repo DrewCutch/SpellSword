@@ -47,7 +47,6 @@ namespace SpellSword.MapGeneration
             while (frontier.Count > 0 && energy > 0)
             {
                 Coord next = frontier.Dequeue();
-                explored.Add(next);
 
                 if (rng.NextDouble() > SpreadChance)
                 {
@@ -55,7 +54,6 @@ namespace SpellSword.MapGeneration
 
                     if (rng.NextDouble() < DeadChance)
                         explored.Add(next);
-                    //frontier.Enqueue(next);
 
                     continue;
                 }
@@ -65,6 +63,7 @@ namespace SpellSword.MapGeneration
                 if (!mapInfo.Map.IsWalkable(next) || !mapInfo.Map.AddEntity(obj)) 
                     continue;
 
+                explored.Add(next);
 
                 energy--;
                 foreach (Coord neighbor in AdjacencyRule.CARDINALS.Neighbors(next))

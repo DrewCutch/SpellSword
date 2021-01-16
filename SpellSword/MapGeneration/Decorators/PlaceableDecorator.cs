@@ -17,7 +17,12 @@ namespace SpellSword.MapGeneration
 
         public void Decorate(MapInfo mapInfo, MapArea area, IGenerator rng)
         {
-            Placeable.Place(mapInfo, area.RandomPosition(), rng);
+            MapArea restrictedArea = new MapArea();
+
+            restrictedArea.Add(area.Positions);
+            restrictedArea.Remove(area.Bounds.PerimeterPositions());
+
+            Placeable.Place(mapInfo, restrictedArea.RandomPosition(), rng);
         }
 
         public bool CanDecorate(MapInfo mapInfo, MapArea area)
