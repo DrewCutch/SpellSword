@@ -17,18 +17,13 @@ namespace SpellSword.MapGeneration
         private int _accumulatedWeight;
         private readonly IGenerator _defaultRng;
 
-        public WeightedRandomBag():this(SingletonRandom.DefaultRNG)
-        {
-
-        }
-
         public WeightedRandomBag(IGenerator defaultRng)
         {
             _defaultRng = defaultRng;
             _choices = new List<Choice>();
         }
 
-        public WeightedRandomBag(IEnumerable<(T, int)> choices, IGenerator rng = null): this()
+        public WeightedRandomBag(IEnumerable<(T, int)> choices, IGenerator rng = null): this(rng)
         {
             foreach ((T value, int weight) in choices)
             {
