@@ -40,7 +40,7 @@ namespace SpellSword.MapGeneration
 
         public T Get(IGenerator rng, bool remove = false)
         {
-            double r = rng.NextDouble() * _accumulatedWeight;
+            int r = rng.Next(0, _accumulatedWeight + 1);
 
             foreach (Choice choice in _choices)
             {

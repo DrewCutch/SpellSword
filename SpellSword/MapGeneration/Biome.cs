@@ -144,17 +144,24 @@ namespace SpellSword.MapGeneration
                 yield return mapInfo;
             }
 
-
             foreach (Coord pos in area.Positions())
             {
                 if (mapInfo.Map.GetTerrain(pos) == null)
                     mapInfo.Map.SetTerrain(SolidRock(pos));
             }
 
+            Console.WriteLine($"Next random: {rng.Next()}");
+
+            Console.WriteLine($"num rooms: {rooms.Count}");
+
             foreach (IRoom room in rooms)
             {
                 room.GeneratedBy.Populate(mapInfo, room, rng);
+                int nextRNG = rng.Next();
+                Console.WriteLine($"Next random: {nextRNG}");
             }
+
+            
 
             // place exit
             while (true)
@@ -210,9 +217,9 @@ namespace SpellSword.MapGeneration
         {
             MapInfo mapInfo = floor.MapInfo;
 
-            double areaCoefficient = area.Count * rng.NextDouble(1.0, 2.0);
+            int areaCoefficient = (area.Count * rng.Next(10, 20)) / 1000;
 
-            int numDecorators = Math.Max(1, (int) (areaCoefficient / 100));
+            int numDecorators = Math.Max(1, areaCoefficient);
 
             foreach (int _ in Range(0, numDecorators))
             {
