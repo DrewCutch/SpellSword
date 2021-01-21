@@ -7,6 +7,7 @@ using BearLib;
 using GoRogue;
 using GoRogue.GameFramework;
 using GoRogue.Messaging;
+using GoRogue.Random;
 using SpellSword.Actors;
 using SpellSword.Actors.Action;
 using SpellSword.Actors.Effects;
@@ -39,16 +40,25 @@ namespace SpellSword
             StartGameDungeon();
         }
 
+        private static void PoisonDefaultRandom()
+        {
+            var type = typeof(SingletonRandom);
+            var field = type.GetField("DefaultRNG", BindingFlags.Static | BindingFlags.Public);
+            field.SetValue(null, null);
+        }
+
         private static void MapGenerator()
         {
-            IMapGenerator generator = new MapGenerator();
-            IEnumerator<MapInfo> generationSteps = generator.GenerationSteps(120, 40, "helloseed").GetEnumerator();
+            Timeline timeline = new Timeline();
+            MessageBus mainBus = new MessageBus();
+
+            IMapGenerator generator = new MapGenerator(timeline, mainBus);
+            IEnumerator<MapInfo> generationSteps = generator.GenerationSteps(120, 40, "" + SingletonRandom.DefaultRNG.Next()).GetEnumerator();
             generationSteps.MoveNext();
 
-            Timeline timeline = new Timeline();
+            
             MapInfo mapInfo = generationSteps.Current;
             Map map = mapInfo.Map;
-            MessageBus mainBus = new MessageBus();
             Spawner spawner = new Spawner(map);
 
             JoystickConfig joystickConfig = new JoystickConfig
@@ -72,7 +82,6 @@ namespace SpellSword
             map.ObjectRemoved += (sender, eventArgs) => viewPane.SetDirty();
             map.ObjectMoved += (sender, eventArgs) => viewPane.SetDirty();
             map.ObjectAdded += (sender, eventArgs) => viewPane.SetDirty();
-
 
             TextPane descriptionPane = new TextPane("");
 
@@ -111,8 +120,7 @@ namespace SpellSword
                 inputRouter.HandleInput();
 
                 renderer.Refresh();
-
-
+                
                 // Artificially slow generation process
                 while (Environment.TickCount - lastFrame < 50)
                 {
@@ -142,13 +150,15 @@ namespace SpellSword
 
             //Dungeon dungeon = new Dungeon();
             // dungeon.Enter();
-            
+
+            MessageBus mainBus = new MessageBus();
+
             Timeline timeline = new Timeline();
-            MapInfo mapInfo = new MapGenerator().Generate(120, 40, "helloseed");
+            MapInfo mapInfo = new MapGenerator(timeline, mainBus).Generate(120, 40, "helloseed");
             Map map = mapInfo.Map;
             LightMap lightMap = mapInfo.LightMap;
 
-            MessageBus mainBus = new MessageBus();
+            
             Spawner spawner = new Spawner(map);
 
             mainBus.RegisterSubscriber(spawner);
@@ -184,7 +194,7 @@ namespace SpellSword
             Actor playerActor = new Actor(playerBeing, control, mainBus);
             player.AddComponent(playerActor);
             player.AddComponent(new GlyphComponent(new Glyph('@', Color.Aqua)));
-            player.AddComponent(new LightSourceComponent(lightMap, new Light(Color.Aqua, Coord.NONE, 4, 5)));
+            player.AddComponent(new LightSourceComponent(lightMap, new Light(Color.Aqua, Coord.NONE, 4, 8)));
             player.AddComponent(new FOVExplorerComponent());
 
             EffectTargetComponent playerEffectTarget = new EffectTargetComponent();
@@ -284,7 +294,7 @@ namespace SpellSword
         {
             MessageBus gameBus = new MessageBus();
 
-            Dungeon dungeon = new Dungeon(gameBus, new Rectangle(0, 0, 120, 40), Source.From<IBiome>(Biomes.TestBiome), "hello");
+            Dungeon dungeon = new Dungeon(gameBus, new Rectangle(0, 0, 120, 40), Source.From<GenerationContext, IBiome>(Biomes.TestBiome), "hello");
 
 
             JoystickConfig joystickConfig = new JoystickConfig
