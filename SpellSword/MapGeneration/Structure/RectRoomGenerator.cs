@@ -106,7 +106,7 @@ namespace SpellSword.MapGeneration.Structure
 
             roomBounds = roomBounds.WithPosition(offset + connectAt.Position);
 
-            return mapInfo.Map.Terrain.AllEmpty(roomBounds);
+            return mapInfo.Map.Terrain.AllEmpty(roomBounds.Positions());
         }
 
         public List<Hook> Populate(MapInfo mapInfo, IRoom room, IGenerator rng)

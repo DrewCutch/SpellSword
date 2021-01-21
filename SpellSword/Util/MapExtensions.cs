@@ -9,9 +9,9 @@ namespace SpellSword.Util
 {
     static class MapExtensions
     {
-        public static bool AllEmpty(this IMapView<IGameObject> map, Rectangle area)
+        public static bool AllEmpty(this IMapView<IGameObject> map, IEnumerable<Coord> area)
         {
-            foreach (Coord pos in area.Positions())
+            foreach (Coord pos in area)
             {
                 if (!map.Contains(pos) || map[pos] != null)
                     return false;
