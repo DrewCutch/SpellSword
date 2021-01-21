@@ -29,7 +29,7 @@ namespace SpellSword.Game
 
         private List<Floor> _floors;
 
-        private Source<IBiome> _biomes;
+        private Source<GenerationContext, IBiome> _biomes;
         private Rectangle _floorBounds;
 
         private ResettableRandom _rng;
@@ -56,7 +56,7 @@ namespace SpellSword.Game
 
         private List<FloorTransitionEvent> _pendingTransitions;
 
-        public Dungeon(MessageBus gameBus, Rectangle floorBounds, Source<IBiome> biomes, string seed)
+        public Dungeon(MessageBus gameBus, Rectangle floorBounds, Source<GenerationContext, IBiome> biomes, string seed)
         {
             MainBus = gameBus;
 
@@ -109,7 +109,7 @@ namespace SpellSword.Game
 
             Spawner spawner = new Spawner(map);
 
-            IBiome nextBiome = _biomes.Pull(_rng).Use();
+            IBiome nextBiome = _biomes.Pull(new GenerationContext(_rng)).Use();
 
             Timeline nextTimeline = new Timeline();
             MessageBus nextMessageBus = new MessageBus();
