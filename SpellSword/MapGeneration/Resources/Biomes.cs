@@ -48,13 +48,29 @@ namespace SpellSword.MapGeneration.Resources
             {
                 GameObject grass = new GameObject(pos, Layers.Floor, null);
                 grass.AddComponent(new GlyphComponent('"', Color.Cyan));
-                grass.AddComponent(new LightSourceComponent(mapInfo.LightMap, new Light(Color.Cyan, new Coord(0,0), 3, 5)));
+                grass.AddComponent(new LightSourceComponent(mapInfo.LightMap, new Light(Color.Cyan, new Coord(0,0), 3, 7)));
                 grass.AddComponent(new NameComponent(new Title("in", "", "mana mushrooms")));
 
                 return grass;
             }, 15, .8f, .8f);
 
-       
+        private static Spreader GlowingFungusSpreader = new Spreader(
+            (mapInfo, pos) =>
+            {
+                int red = SingletonRandom.DefaultRNG.Next(220, 256);
+                int green = SingletonRandom.DefaultRNG.Next(50, 100);
+                int blue = SingletonRandom.DefaultRNG.Next(50, 100);
+                Color color = Color.FromArgb(red, green, blue);
+
+                GameObject grass = new GameObject(pos, Layers.Floor, null);
+                grass.AddComponent(new GlyphComponent('"', color));
+                grass.AddComponent(new LightSourceComponent(mapInfo.LightMap, new Light(color, new Coord(0, 0), 4, 10)));
+                grass.AddComponent(new NameComponent(new Title("in", "", "fire fungus")));
+
+                return grass;
+            }, 15, .8f, .8f);
+
+
         private static Placable TorchPlacer = new Placable(
             (mapInfo, pos) =>
         {
@@ -81,7 +97,7 @@ namespace SpellSword.MapGeneration.Resources
 
             GameObject torch = new GameObject(pos, Layers.Main, null);
             torch.AddComponent(new GlyphComponent('i', Color.OrangeRed));
-            torch.AddComponent(new LightSourceComponent(mapInfo.LightMap, new Light(Color.LightGoldenrodYellow, wallAway, 20, 20)));
+            torch.AddComponent(new LightSourceComponent(mapInfo.LightMap, new Light(Color.LightGoldenrodYellow, wallAway, 20, 25)));
             torch.AddComponent(new NameComponent(new Title("over", "", "torch")));
 
             return torch;
@@ -103,7 +119,7 @@ namespace SpellSword.MapGeneration.Resources
                 IGameObject floor = new GameObject(pos, Layers.Terrain, null, true);
 
                 int red = SingletonRandom.DefaultRNG.Next(85, 95);
-                int green = SingletonRandom.DefaultRNG.Next(55, 65);
+                int green = SingletonRandom.DefaultRNG.Next(70, 80);
                 int blue = SingletonRandom.DefaultRNG.Next(15, 25);
                 Color tileColor = Color.FromArgb(green, green, green);
 
@@ -120,6 +136,8 @@ namespace SpellSword.MapGeneration.Resources
             IRoomGenerator closet = new RectRoomGenerator(new Rectangle(0, 0, 4, 4), new Rectangle(0, 0, 6, 6), WallPlaceable, FloorPlacable);
             IRoomGenerator basicRoom = new RectRoomGenerator(new Rectangle(0, 0, 8, 8), new Rectangle(0, 0, 10, 10), WallPlaceable, FloorPlacable);
             IRoomGenerator largeRoom = new RectRoomGenerator(new Rectangle(0, 0, 10, 10), new Rectangle(0, 0, 20, 20), WallPlaceable, FloorPlacable);
+
+            IRoomGenerator compositeRoom = new RectCompositeRoomGenerator(2,3, new Rectangle(0, 0, 8, 8), new Rectangle(0, 0, 10, 10), WallPlaceable, FloorPlacable);
 
             IRoomGenerator hugeRoom = new RectRoomGenerator(new Rectangle(0, 0, 20, 20), new Rectangle(0, 0, 30, 30), WallPlaceable, FloorPlacable);
 
@@ -153,6 +171,7 @@ namespace SpellSword.MapGeneration.Resources
 
             decorationSource.Add(foliageSource);
 
+            compositeRoom.Decorators = decorationSource;
             basicRoom.Decorators = decorationSource;
             largeRoom.Decorators = decorationSource;
             hugeRoom.Decorators = decorationSource;
