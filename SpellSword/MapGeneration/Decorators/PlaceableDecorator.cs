@@ -22,7 +22,7 @@ namespace SpellSword.MapGeneration
             restrictedArea.Add(area.Positions);
             restrictedArea.Remove(area.Bounds.PerimeterPositions());
 
-            Placeable.Place(mapInfo, restrictedArea.RandomPosition(), rng);
+            Placeable.Place(mapInfo, restrictedArea.RandomPosition(rng), rng);
         }
 
         public bool CanDecorate(MapInfo mapInfo, MapArea area)
