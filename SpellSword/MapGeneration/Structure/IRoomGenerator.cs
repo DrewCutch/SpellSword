@@ -8,9 +8,9 @@ namespace SpellSword.MapGeneration.Structure
 {
     interface IRoomGenerator
     {
-        Source<IRoomGenerator> NeighborPossibilities { get; set; }
+        Source<GenerationContext, IRoomGenerator> NeighborPossibilities { get; set; }
 
-        Source<IAreaDecorator> Decorators { get; set; }
+        Source<GenerationContext, IAreaDecorator> Decorators { get; set; }
 
         public IRoom Generate(MapInfo mapInfo, RoomConnection connectAt, IGenerator rng);
 

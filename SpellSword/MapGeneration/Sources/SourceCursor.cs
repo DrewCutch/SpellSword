@@ -4,19 +4,19 @@ using System.Text;
 
 namespace SpellSword.MapGeneration.Sources
 {
-    public class SourceCursor<T>
+    public class SourceCursor<ValueType>
     {
-        public readonly T Value;
+        public readonly ValueType Value;
 
-        public event Action<T> OnUsed;
+        public event Action<ValueType> OnUsed;
 
-        public SourceCursor(T value, Action<T> onUsed)
+        public SourceCursor(ValueType value, Action<ValueType> onUsed)
         {
             Value = value;
             OnUsed += onUsed;
         }
 
-        public T Use()
+        public ValueType Use()
         {
             OnUsed.Invoke(Value);
 

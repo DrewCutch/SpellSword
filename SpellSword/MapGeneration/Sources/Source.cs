@@ -4,13 +4,13 @@ namespace SpellSword.MapGeneration.Sources
 {
     public static class Source
     {
-        public static Source<T> From<T>(T value)
+        public static Source<TContext, TValue> From<TContext, TValue>(TValue value)
         {
-            return new ConstantSource<T>(value);
+            return new ConstantSource<TContext, TValue>(value);
         }
     }
 
-    public abstract class Source<T>
+    public abstract class Source<TContext, TValue>
     {
         public bool Shared { get; }
 
@@ -19,14 +19,14 @@ namespace SpellSword.MapGeneration.Sources
             Shared = shared;
         }
 
-        public abstract SourceCursor<T> Pull(IGenerator rng);
+        public abstract SourceCursor<TValue> Pull(TContext context);
         public abstract bool IsEmpty();
 
-        public abstract Source<T> Clone();
+        public abstract Source<TContext, TValue> Clone();
 
-        public static implicit operator Source<T>(T value)
+        public static implicit operator Source<TContext, TValue>(TValue value)
         {
-            return new ConstantSource<T>(value);
+            return new ConstantSource<TContext, TValue>(value);
         }
     }
 }

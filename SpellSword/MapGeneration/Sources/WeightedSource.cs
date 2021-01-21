@@ -6,7 +6,7 @@ using Troschuetz.Random;
 
 namespace SpellSword.MapGeneration.Sources
 {
-    class WeightedSource<T>: Source<T>
+    class WeightedSource<TContext, TValue>: Source<TContext, TValue> where TContext: IRandomContext 
     {
         public int Count => _choices.Count;
 
@@ -19,16 +19,16 @@ namespace SpellSword.MapGeneration.Sources
             _accumulatedWeight = 0;
         }
 
-        public void Add(Source<T> source, int weight)
+        public void Add(Source<TContext, TValue> source, int weight)
         {
             _accumulatedWeight += weight;
             Choice choice = new Choice() { Weight = weight, Value = source };
             _choices.Add(choice);
         }
 
-        public override SourceCursor<T> Pull(IGenerator rng)
+        public override SourceCursor<TValue> Pull(TContext context)
         {
-            double r = rng.NextDouble() * _accumulatedWeight;
+            int r = context.Generator.Next(0, _accumulatedWeight + 1);
             int weightSoFar = 0;
 
             foreach ((Choice choice, int i) in _choices.WithIndex())
@@ -36,7 +36,7 @@ namespace SpellSword.MapGeneration.Sources
                 weightSoFar += choice.Weight;
                 if (weightSoFar >= r)
                 {
-                    SourceCursor<T> choiceCursor = choice.Value.Pull(rng);
+                    SourceCursor<TValue> choiceCursor = choice.Value.Pull(context);
 
                     choiceCursor.OnUsed += (val) => { OnUseChoice(i);};
 
@@ -65,12 +65,12 @@ namespace SpellSword.MapGeneration.Sources
             return Count == 0;
         }
 
-        public override Source<T> Clone()
+        public override Source<TContext, TValue> Clone()
         {
             if (Shared)
                 return this;
 
-            WeightedSource<T> clone = new WeightedSource<T>(false);
+            WeightedSource<TContext, TValue> clone = new WeightedSource<TContext, TValue>(false);
 
             foreach (Choice choice in _choices)
             {
@@ -83,7 +83,7 @@ namespace SpellSword.MapGeneration.Sources
         private class Choice
         {
             public int Weight;
-            public Source<T> Value;
+            public Source<TContext, TValue> Value;
         }
     }
 }

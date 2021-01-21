@@ -4,6 +4,7 @@ using System.Text;
 using GoRogue;
 using GoRogue.MapGeneration;
 using GoRogue.MapGeneration.Connectors;
+using GoRogue.Random;
 using SpellSword.MapGeneration.Decorators;
 using SpellSword.MapGeneration.Sources;
 using SpellSword.Util;
@@ -13,8 +14,8 @@ namespace SpellSword.MapGeneration.Structure
 {
     class RectRoomGenerator: IRoomGenerator
     {
-        public Source<IRoomGenerator> NeighborPossibilities { get; set; }
-        public Source<IAreaDecorator> Decorators { get; set; }
+        public Source<GenerationContext, IRoomGenerator> NeighborPossibilities { get; set; }
+        public Source<GenerationContext, IAreaDecorator> Decorators { get; set; }
 
         private Rectangle _minBounds;
         private Rectangle _maxBounds;
@@ -30,8 +31,8 @@ namespace SpellSword.MapGeneration.Structure
             _wall = wall;
             _floor = floor;
 
-            Decorators = new PrioritySource<IAreaDecorator>(false);
-            NeighborPossibilities = new PrioritySource<IRoomGenerator>(false);
+            Decorators = new PrioritySource<GenerationContext, IAreaDecorator>(false);
+            NeighborPossibilities = new PrioritySource<GenerationContext, IRoomGenerator>(false);
         }
 
         public IRoom Generate(MapInfo mapInfo, RoomConnection connectAt, IGenerator rng)
@@ -111,9 +112,10 @@ namespace SpellSword.MapGeneration.Structure
 
         public List<Hook> Populate(MapInfo mapInfo, IRoom room, IGenerator rng)
         {
-            Source<IAreaDecorator> individualSource = Decorators.Clone();
+            Source<GenerationContext, IAreaDecorator> individualSource = Decorators.Clone();
 
-            int numDecorators = Math.Max(room.Area.Count / 20 + rng.Next(0, 2), 3);
+            int numDecorators = Math.Max(room.Area.Count / 50 + rng.Next(0, 2), 3);
+
             List<Hook> hooks = new List<Hook>();
 
             for (int n = 0; n < numDecorators; n++)
@@ -121,12 +123,13 @@ namespace SpellSword.MapGeneration.Structure
                 if (individualSource.IsEmpty())
                     return hooks;
 
-                SourceCursor<IAreaDecorator> decoratorCursor = individualSource.Pull(rng);
+                SourceCursor<IAreaDecorator> decoratorCursor = individualSource.Pull(new GenerationContext(rng));
 
                 if (!decoratorCursor.Value.CanDecorate(mapInfo, room.Area)) 
                     continue;
 
                 decoratorCursor.Value.Decorate(mapInfo, room.Area, rng);
+                
                 decoratorCursor.Use();
             }
 

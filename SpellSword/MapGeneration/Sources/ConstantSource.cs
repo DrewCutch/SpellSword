@@ -2,17 +2,17 @@
 
 namespace SpellSword.MapGeneration.Sources
 {
-    class ConstantSource<T>: Source<T>
+    class ConstantSource<TContext, TValue> : Source<TContext, TValue>
     {
-        private T _value;
-        public ConstantSource(T value) : base(true)
+        private TValue _value;
+        public ConstantSource(TValue value) : base(true)
         {
             _value = value;
         }
 
-        public override SourceCursor<T> Pull(IGenerator rng)
+        public override SourceCursor<TValue> Pull(TContext context)
         {
-            return new SourceCursor<T>(_value, (val) => { });
+            return new SourceCursor<TValue>(_value, (val) => { });
         }
 
         public override bool IsEmpty()
@@ -20,7 +20,7 @@ namespace SpellSword.MapGeneration.Sources
             return false;
         }
 
-        public override Source<T> Clone()
+        public override Source<TContext, TValue> Clone()
         {
             return this;
         }

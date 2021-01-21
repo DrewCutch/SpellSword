@@ -14,9 +14,9 @@ namespace SpellSword.MapGeneration.Structure
     {
         private IPlaceable _wall;
         private IPlaceable _floor;
-        private Source<IRoomGenerator> _endPossibilities;
+        private Source<GenerationContext, IRoomGenerator> _endPossibilities;
 
-        public HallGenerator(IPlaceable wall, IPlaceable floor, Source<IRoomGenerator> endPossibilities)
+        public HallGenerator(IPlaceable wall, IPlaceable floor, Source<GenerationContext, IRoomGenerator> endPossibilities)
         {
             _wall = wall;
             _floor = floor;

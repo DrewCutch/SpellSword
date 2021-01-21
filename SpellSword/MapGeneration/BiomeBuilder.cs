@@ -11,9 +11,9 @@ namespace SpellSword.MapGeneration
     {
         private readonly List<(IAreaDecorator, int)> _decoratorWeights;
 
-        private Source<IRoomGenerator> _rootRoomSource;
+        private Source<GenerationContext, IRoomGenerator> _rootRoomSource;
 
-        private Source<IHallGenerator> _hallGeneratorSource;
+        private Source<GenerationContext, IHallGenerator> _hallGeneratorSource;
 
         public BiomeBuilder()
         {
@@ -26,14 +26,14 @@ namespace SpellSword.MapGeneration
             return this;
         }
 
-        public BiomeBuilder WithRoomSource(Source<IRoomGenerator> rootRoomSource)
+        public BiomeBuilder WithRoomSource(Source<GenerationContext, IRoomGenerator> rootRoomSource)
         {
             _rootRoomSource = rootRoomSource;
 
             return this;
         }
 
-        public BiomeBuilder WithHallSource(Source<IHallGenerator> hallSource)
+        public BiomeBuilder WithHallSource(Source<GenerationContext, IHallGenerator> hallSource)
         {
             _hallGeneratorSource = hallSource;
 

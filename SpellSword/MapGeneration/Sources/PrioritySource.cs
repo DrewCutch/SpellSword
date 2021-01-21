@@ -5,21 +5,21 @@ using Troschuetz.Random;
 
 namespace SpellSword.MapGeneration.Sources
 {
-    class PrioritySource<T>: Source<T>
+    class PrioritySource<TContext, TValue> : Source<TContext, TValue>
     {
-        private Queue<Source<T>> _sources;
+        private Queue<Source<TContext, TValue>> _sources;
 
         public PrioritySource(bool shared): base(shared)
         {
-            _sources = new Queue<Source<T>>();
+            _sources = new Queue<Source<TContext, TValue>>();
         }
 
-        public void Add(Source<T> source)
+        public void Add(Source<TContext, TValue> source)
         {
             _sources.Enqueue(source);
         }
 
-        public override SourceCursor<T> Pull(IGenerator rng)
+        public override SourceCursor<TValue> Pull(TContext context)
         {
             while (_sources.Count > 0 && _sources.Peek().IsEmpty())
                 _sources.Dequeue();
@@ -27,7 +27,7 @@ namespace SpellSword.MapGeneration.Sources
             if (_sources.Count == 0)
                 return default;
 
-            return _sources.Peek().Pull(rng);
+            return _sources.Peek().Pull(context);
         }
 
         public override bool IsEmpty()
@@ -35,15 +35,15 @@ namespace SpellSword.MapGeneration.Sources
             return _sources.Count == 0 || _sources.All((source) => source.IsEmpty());
         }
 
-        public override Source<T> Clone()
+        public override Source<TContext, TValue> Clone()
         {
             if (Shared)
                 return this;
 
             
-            PrioritySource<T> clone = new PrioritySource<T>(false);
+            PrioritySource<TContext, TValue> clone = new PrioritySource<TContext, TValue>(false);
 
-            foreach (Source<T> source in _sources)
+            foreach (Source<TContext, TValue> source in _sources)
             {
                 clone.Add(source.Clone());
             }

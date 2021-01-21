@@ -11,11 +11,11 @@ namespace SpellSword.MapGeneration.Structure
         public Coord Position { get; }
         public Direction Direction { get; }
 
-        public Source<IRoomGenerator> Possibilities { get; }
+        public Source<GenerationContext, IRoomGenerator> Possibilities { get; }
 
         public bool UseHall { get; }
 
-        public RoomConnection(Coord position, Direction direction, Source<IRoomGenerator> possibilities, bool useHall)
+        public RoomConnection(Coord position, Direction direction, Source<GenerationContext, IRoomGenerator> possibilities, bool useHall)
         {
             Position = position;
             Direction = direction;

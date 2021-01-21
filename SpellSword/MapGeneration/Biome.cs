@@ -20,7 +20,6 @@ using SpellSword.Util;
 using SpellSword.Util.Collections;
 using Troschuetz.Random;
 using static System.Linq.Enumerable;
-using Extensions = System.Xml.XPath.Extensions;
 using Rectangle = GoRogue.Rectangle;
 
 namespace SpellSword.MapGeneration
@@ -31,11 +30,11 @@ namespace SpellSword.MapGeneration
 
         private WeightedRandomBag<IAreaDecorator> _decorators;
 
-        private Source<IRoomGenerator> _rootRoomSource;
+        private Source<GenerationContext, IRoomGenerator> _rootRoomSource;
 
-        private Source<IHallGenerator> _hallGenerators;
+        private Source<GenerationContext, IHallGenerator> _hallGenerators;
 
-        public Biome(WeightedRandomBag<IAreaDecorator> decorators, Source<IRoomGenerator> rootRoomSource, Source<IHallGenerator> hallGenerators)
+        public Biome(WeightedRandomBag<IAreaDecorator> decorators, Source<GenerationContext, IRoomGenerator> rootRoomSource, Source<GenerationContext, IHallGenerator> hallGenerators)
         {
             _decorators = decorators;
             _rootRoomSource = rootRoomSource;
@@ -44,13 +43,14 @@ namespace SpellSword.MapGeneration
 
         public IEnumerable<MapInfo> GenerateOn(Floor floor, Rectangle area, ResettableRandom rng)
         {
+            GenerationContext context = new GenerationContext(rng);
             MapInfo mapInfo = floor.MapInfo;
 
             Bag<RoomConnection> pendingConnections = new Bag<RoomConnection>(rng);
             List<IRoom> rooms = new List<IRoom>();
 
             Rectangle initialRoomRect = new Rectangle(new Coord(20, 20), 3, 3);
-            SourceCursor<IRoomGenerator> initialSourceCursor = _rootRoomSource.Pull(rng);
+            SourceCursor<IRoomGenerator> initialSourceCursor = _rootRoomSource.Pull(context);
             IRoomGenerator initialRoomGenerator = initialSourceCursor.Value;
             initialSourceCursor.Use();
 
@@ -78,7 +78,7 @@ namespace SpellSword.MapGeneration
                     continue;
                 }
 
-                SourceCursor<IRoomGenerator> generatorCursor = nextConnection.Possibilities.Pull(rng);
+                SourceCursor<IRoomGenerator> generatorCursor = nextConnection.Possibilities.Pull(context);
 
                 IRoomGenerator generator = generatorCursor.Value;
 
@@ -103,7 +103,7 @@ namespace SpellSword.MapGeneration
                 yield return mapInfo;
 
 
-                SourceCursor<IHallGenerator> hallGeneratorCursor = _hallGenerators.Pull(rng);;
+                SourceCursor<IHallGenerator> hallGeneratorCursor = _hallGenerators.Pull(context);;
                 IHallGenerator hallGenerator = hallGeneratorCursor.Value;
 
                 if (!hallGenerator.CanGenerate(mapInfo, nextConnection.Position, hallEnd, rng))
@@ -131,7 +131,7 @@ namespace SpellSword.MapGeneration
                 if(mapInfo.Map.AStar.ShortestPath(nextConnection.Position, hit).Length < 40)
                     continue;
 
-                SourceCursor<IHallGenerator> hallGeneratorCursor = _hallGenerators.Pull(rng); ;
+                SourceCursor<IHallGenerator> hallGeneratorCursor = _hallGenerators.Pull(context); ;
                 IHallGenerator hallGenerator = hallGeneratorCursor.Value;
 
                 if (!hallGenerator.CanGenerate(mapInfo, nextConnection.Position, hit, rng))

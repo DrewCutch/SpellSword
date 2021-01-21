@@ -5,25 +5,25 @@ using Troschuetz.Random;
 
 namespace SpellSword.MapGeneration.Sources
 {
-    class LimitedSource<T>: Source<T>
+    class LimitedSource<TContext, TValue> : Source<TContext, TValue>
     {
-        private Source<T> _baseSource;
+        private Source<TContext, TValue> _baseSource;
         public int Limit { get; }
         private int _used;
 
-        public LimitedSource(Source<T> baseSource, int limit, bool shared): base(shared)
+        public LimitedSource(Source<TContext, TValue> baseSource, int limit, bool shared): base(shared)
         {
             _baseSource = baseSource;
             Limit = limit;
             _used = 0;
         }
 
-        public override SourceCursor<T> Pull(IGenerator rng)
+        public override SourceCursor<TValue> Pull(TContext context)
         {
             if (_used == Limit)
                 return default;
 
-            SourceCursor<T> baseCursor = _baseSource.Pull(rng);
+            SourceCursor<TValue> baseCursor = _baseSource.Pull(context);
 
             baseCursor.OnUsed += (value) => { _used += 1; };
 
@@ -35,12 +35,12 @@ namespace SpellSword.MapGeneration.Sources
             return _used == Limit || _baseSource.IsEmpty();
         }
 
-        public override Source<T> Clone()
+        public override Source<TContext, TValue> Clone()
         {
             if (Shared)
                 return this;
 
-            LimitedSource<T> clone = new LimitedSource<T>(_baseSource.Clone(), Limit, false);
+            LimitedSource<TContext, TValue> clone = new LimitedSource<TContext, TValue>(_baseSource.Clone(), Limit, false);
 
             return clone;
         }

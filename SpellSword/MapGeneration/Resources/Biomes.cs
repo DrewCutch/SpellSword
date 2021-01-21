@@ -115,7 +115,7 @@ namespace SpellSword.MapGeneration.Resources
                 return floor;
             });
 
-        private static Source<IRoomGenerator> RootSource()
+        private static Source<GenerationContext, IRoomGenerator> RootSource()
         {
             IRoomGenerator closet = new RectRoomGenerator(new Rectangle(0, 0, 4, 4), new Rectangle(0, 0, 6, 6), WallPlaceable, FloorPlacable);
             IRoomGenerator basicRoom = new RectRoomGenerator(new Rectangle(0, 0, 8, 8), new Rectangle(0, 0, 10, 10), WallPlaceable, FloorPlacable);
@@ -123,44 +123,48 @@ namespace SpellSword.MapGeneration.Resources
 
             IRoomGenerator hugeRoom = new RectRoomGenerator(new Rectangle(0, 0, 20, 20), new Rectangle(0, 0, 30, 30), WallPlaceable, FloorPlacable);
 
-            WeightedSource<IRoomGenerator> roomSource = new WeightedSource<IRoomGenerator>(true);
-            roomSource.Add(Source.From(closet), 1);
-            roomSource.Add(Source.From(basicRoom), 5);
-            roomSource.Add(Source.From(largeRoom), 5);
-            roomSource.Add(new LimitedSource<IRoomGenerator>(Source.From(hugeRoom), 1, true), 3);
+            WeightedSource<GenerationContext, IRoomGenerator> roomSource = new WeightedSource<GenerationContext, IRoomGenerator>(true);
+            //roomSource.Add(Source.From(closet), 1);
+            roomSource.Add(Source.From<GenerationContext, IRoomGenerator>(basicRoom), 5);
+            roomSource.Add(Source.From<GenerationContext, IRoomGenerator>(largeRoom), 5);
+            roomSource.Add(Source.From<GenerationContext, IRoomGenerator>(compositeRoom), 10);
+            roomSource.Add(new LimitedSource<GenerationContext, IRoomGenerator>(Source.From<GenerationContext, IRoomGenerator>(hugeRoom), 1, true), 3);
 
             basicRoom.NeighborPossibilities = roomSource;
             largeRoom.NeighborPossibilities = roomSource;
             hugeRoom.NeighborPossibilities = roomSource;
+            compositeRoom.NeighborPossibilities = roomSource;
+            
+            WeightedSource<GenerationContext, IAreaDecorator> lightingSource = new WeightedSource<GenerationContext, IAreaDecorator>(true);
+            lightingSource.Add(Source.From<GenerationContext, IAreaDecorator>(new PlaceableDecorator(GlowingMushroomsSpreader)), 1);
+            lightingSource.Add(Source.From<GenerationContext, IAreaDecorator>(new PlaceableDecorator(GlowingFungusSpreader)), 1);
+            lightingSource.Add(Source.From<GenerationContext, IAreaDecorator>(new WallDecorator(TorchPlacer)), 10);
 
-            WeightedSource<IAreaDecorator> lightingSource = new WeightedSource<IAreaDecorator>(true);
-            lightingSource.Add(Source.From<IAreaDecorator>(new PlaceableDecorator(GlowingMushroomsSpreader)), 1);
-            lightingSource.Add(Source.From<IAreaDecorator>(new WallDecorator(TorchPlacer)), 5);
 
-
-            PrioritySource<IAreaDecorator> decorationSource = new PrioritySource<IAreaDecorator>(false);
+            PrioritySource<GenerationContext, IAreaDecorator> decorationSource = new PrioritySource<GenerationContext, IAreaDecorator>(false);
             
             // First, place lighting in room (always)
-            decorationSource.Add(new LimitedSource<IAreaDecorator>(lightingSource, 1, false));
+            decorationSource.Add(new LimitedSource<GenerationContext, IAreaDecorator>(lightingSource, 1, false));
 
             //Then place foliage
-            WeightedSource<IAreaDecorator> foliageSource = new WeightedSource<IAreaDecorator>(true);
-            foliageSource.Add(Source.From<IAreaDecorator>(new PlaceableDecorator(GrassSpreader)), 1);
-            foliageSource.Add(Source.From<IAreaDecorator>(new PlaceableDecorator(TallGrassSpreader)), 1);
+            WeightedSource<GenerationContext, IAreaDecorator> foliageSource = new WeightedSource<GenerationContext, IAreaDecorator>(true);
+            foliageSource.Add(Source.From<GenerationContext, IAreaDecorator>(new PlaceableDecorator(GrassSpreader)), 1);
+            foliageSource.Add(Source.From<GenerationContext, IAreaDecorator>(new PlaceableDecorator(TallGrassSpreader)), 1);
 
-            //decorationSource.Add(foliageSource);
+            decorationSource.Add(foliageSource);
 
             basicRoom.Decorators = decorationSource;
             largeRoom.Decorators = decorationSource;
+            hugeRoom.Decorators = decorationSource;
 
-            return Source.From(basicRoom);
+            return Source.From<GenerationContext, IRoomGenerator>(basicRoom);
         }
 
-        private static Source<IHallGenerator> HallSource()
+        private static Source<GenerationContext, IHallGenerator> HallSource()
         {
             IHallGenerator hallGenerator = new HallGenerator(WallPlaceable, FloorPlacable, null);
 
-            return Source.From(hallGenerator);
+            return Source.From<GenerationContext, IHallGenerator>(hallGenerator);
         }
 
 
