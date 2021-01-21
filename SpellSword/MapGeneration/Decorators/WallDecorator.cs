@@ -5,6 +5,7 @@ using System.Text;
 using GoRogue;
 using GoRogue.GameFramework;
 using GoRogue.MapGeneration;
+using SpellSword.Util;
 using Troschuetz.Random;
 
 namespace SpellSword.MapGeneration
@@ -20,7 +21,7 @@ namespace SpellSword.MapGeneration
 
         public void Decorate(MapInfo mapInfo, MapArea area, IGenerator rng)
         {
-            IEnumerable<Coord> wallCoords = area.Bounds.PerimeterPositions();
+            IEnumerable<Coord> wallCoords = area.Perimeter();
 
             Coord roomTop = area.Bounds.MinExtent;
             Coord roomMax = area.Bounds.MaxExtent;
