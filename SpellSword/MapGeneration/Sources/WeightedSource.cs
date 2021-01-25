@@ -13,10 +13,15 @@ namespace SpellSword.MapGeneration.Sources
         private List<Choice> _choices;
         private int _accumulatedWeight;
 
-        public WeightedSource(bool shared): base(shared)
+        private bool _sticky;
+        private int _stuckChoice;
+
+        public WeightedSource(bool shared, bool sticky = false): base(shared)
         {
             _choices = new List<Choice>();
             _accumulatedWeight = 0;
+            _sticky = sticky;
+            _stuckChoice = -1;
         }
 
         public void Add(Source<TContext, TValue> source, int weight)
@@ -31,21 +36,28 @@ namespace SpellSword.MapGeneration.Sources
             int r = context.Generator.Next(0, _accumulatedWeight + 1);
             int weightSoFar = 0;
 
-            foreach ((Choice choice, int i) in _choices.WithIndex())
+            int sourceIndex = _stuckChoice;
+
+            if (sourceIndex == -1)
             {
-                weightSoFar += choice.Weight;
-                if (weightSoFar >= r)
+                foreach ((Choice choice, int i) in _choices.WithIndex())
                 {
-                    SourceCursor<TValue> choiceCursor = choice.Value.Pull(context);
+                    weightSoFar += choice.Weight;
+                    if (weightSoFar < r) 
+                        continue;
 
-                    choiceCursor.OnUsed += (val) => { OnUseChoice(i);};
-
-                    return choiceCursor;
+                    sourceIndex = i;
+                    break;
                 }
             }
 
+            if (_sticky)
+                _stuckChoice = sourceIndex;
 
-            return default;
+            SourceCursor<TValue> choiceCursor = _choices[sourceIndex].Value.Pull(context);
+            choiceCursor.OnUsed += (val) => { OnUseChoice(sourceIndex); };
+
+            return choiceCursor;
         }
 
         private void OnUseChoice(int i)
