@@ -13,6 +13,7 @@ using SpellSword.MapGeneration.Structure;
 using SpellSword.Render;
 using SpellSword.Render.Lighting;
 using SpellSword.Speech;
+using SpellSword.TestUtils;
 using Rectangle = GoRogue.Rectangle;
 
 namespace SpellSword.MapGeneration.Resources
@@ -71,7 +72,7 @@ namespace SpellSword.MapGeneration.Resources
             }, 15, .8f, .8f);
 
 
-        private static Placable TorchPlacer = new Placable(
+        private static IPlaceable TorchPlacer = new Placable(
             (mapInfo, pos) =>
         {
             Coord wallAway = new Coord(0, 0);

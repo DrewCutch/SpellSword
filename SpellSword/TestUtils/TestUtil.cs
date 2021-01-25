@@ -31,7 +31,7 @@ namespace SpellSword.TestUtils
 
             Item mainWeapon = new MeleeWeapon(new Damage(1)); // new ProjectileWeapon(3);
 
-            Being goblinBeing = new Being(new SelectedAttributes(new AttributeSet(6, 15, 4, 4, 3)), goblins, new EquipmentSlotSet(), 4, "goblin");
+            Being goblinBeing = new Being(new SelectedAttributes(new AttributeSet(4, 5, 4, 4, 3)), goblins, new EquipmentSlotSet(), 4, "goblin");
 
             goblinBeing.Equipment.Equip(mainWeapon, EquipmentSlot.RightHandEquip);
             goblinBeing.Inventory.Add(gold, 10);
