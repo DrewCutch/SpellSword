@@ -5,6 +5,7 @@ using System.Text;
 using GoRogue;
 using GoRogue.MapGeneration;
 using GoRogue.MapViews;
+using SpellSword.Game;
 using SpellSword.MapGeneration.Sources;
 using Troschuetz.Random;
 
@@ -23,10 +24,10 @@ namespace SpellSword.MapGeneration.Structure
             _endPossibilities = endPossibilities;
         }
 
-        public IRoom Generate(MapInfo mapInfo, Coord connectFrom, Coord connectTo, IGenerator rng)
+        public IRoom Generate(Floor floor, Coord connectFrom, Coord connectTo, IGenerator rng)
         {
-            _floor.Place(mapInfo, connectFrom, rng);
-            _floor.Place(mapInfo, connectTo, rng);
+            _floor.Place(floor, connectFrom, rng);
+            _floor.Place(floor, connectTo, rng);
 
             List<Coord> path = HorizontalVerticalPath(connectFrom, connectTo).ToList();
 
@@ -40,10 +41,10 @@ namespace SpellSword.MapGeneration.Structure
 
                 area.Add(current);
 
-                if (mapInfo.Map.Terrain[current] != null && mapInfo.Map.Terrain[current].IsWalkable)
+                if (floor.MapInfo.Map.Terrain[current] != null && floor.MapInfo.Map.Terrain[current].IsWalkable)
                     continue;
 
-                _floor.Place(mapInfo, current, rng);
+                _floor.Place(floor, current, rng);
 
 
                 HashSet<Coord> wallOptions = new HashSet<Coord> { current + Direction.UP, current + Direction.RIGHT, current + Direction.DOWN, current + Direction.LEFT };
@@ -52,8 +53,8 @@ namespace SpellSword.MapGeneration.Structure
 
                 foreach (Coord pos in wallOptions)
                 {
-                    if (mapInfo.Map.Terrain[pos] == null)
-                        _wall.Place(mapInfo, pos, rng);
+                    if (floor.MapInfo.Map.Terrain[pos] == null)
+                        _wall.Place(floor, pos, rng);
                 }
             }
 
@@ -64,9 +65,9 @@ namespace SpellSword.MapGeneration.Structure
             return new BasicRoom(area, new List<RoomConnection>{finalConnection}, null);
         }
 
-        public bool CanGenerate(MapInfo mapInfo, Coord connectFrom, Coord connectTo, IGenerator rng)
+        public bool CanGenerate(Floor floor, Coord connectFrom, Coord connectTo, IGenerator rng)
         {
-            return mapInfo.Map.Terrain.Contains(connectFrom) && mapInfo.Map.Terrain.Contains(connectTo);
+            return floor.MapInfo.Map.Terrain.Contains(connectFrom) && floor.MapInfo.Map.Terrain.Contains(connectTo);
         }
 
         private static IEnumerable<Coord> HorizontalVerticalPath(Coord start, Coord end)

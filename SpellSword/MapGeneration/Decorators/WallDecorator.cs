@@ -5,6 +5,7 @@ using System.Text;
 using GoRogue;
 using GoRogue.GameFramework;
 using GoRogue.MapGeneration;
+using SpellSword.Game;
 using SpellSword.Util;
 using Troschuetz.Random;
 
@@ -19,7 +20,7 @@ namespace SpellSword.MapGeneration
             _placeable = placeable;
         }
 
-        public void Decorate(MapInfo mapInfo, MapArea area, IGenerator rng)
+        public void Decorate(Floor floor, MapArea area, IGenerator rng)
         {
             IEnumerable<Coord> wallCoords = area.Perimeter();
 
@@ -32,7 +33,7 @@ namespace SpellSword.MapGeneration
             foreach (Coord pos in wallCoords)
             {
                 // only place on walls
-                if(mapInfo.Map.WalkabilityView[pos])
+                if(floor.MapInfo.Map.WalkabilityView[pos])
                     continue;
 
                 Coord offset = pos - roomTop;
@@ -43,12 +44,12 @@ namespace SpellSword.MapGeneration
                 if (offset.Y % ySkip != 0 && pos.Y != roomMax.Y)
                     continue;
 
-                _placeable.Place(mapInfo, pos, rng);
+                _placeable.Place(floor, pos, rng);
             }
             area.Bounds.PerimeterPositions();
         }
 
-        public bool CanDecorate(MapInfo mapInfo, MapArea area)
+        public bool CanDecorate(Floor floor, MapArea area)
         {
             return area.Count > 0;
         }

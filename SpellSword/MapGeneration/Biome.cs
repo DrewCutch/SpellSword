@@ -54,7 +54,7 @@ namespace SpellSword.MapGeneration
             IRoomGenerator initialRoomGenerator = initialSourceCursor.Value;
             initialSourceCursor.Use();
 
-            IRoom initialRoom = initialRoomGenerator.Generate(mapInfo, new RoomConnection(new Coord(area.Width / 4, area.Height / 2), Direction.NONE, null, false), rng);
+            IRoom initialRoom = initialRoomGenerator.Generate(floor, new RoomConnection(new Coord(area.Width / 4, area.Height / 2), Direction.NONE, null, false), rng);
 
             floor.Entrance = initialRoom.Area.Bounds.Center;
 
@@ -84,7 +84,7 @@ namespace SpellSword.MapGeneration
 
                 int[] rngState = rng.GetState();
 
-                if (!generator.CanGenerate(mapInfo, hallConnection, rng))
+                if (!generator.CanGenerate(floor, hallConnection, rng))
                 {
                     pendingConnections.Put(nextConnection);
                     n += 1;
@@ -93,7 +93,7 @@ namespace SpellSword.MapGeneration
 
                 rng.LoadState(rngState);
 
-                IRoom room = generator.Generate(mapInfo, hallConnection, rng);
+                IRoom room = generator.Generate(floor, hallConnection, rng);
                 rooms.Add(room);
 
                 generatorCursor.Use();
@@ -106,10 +106,10 @@ namespace SpellSword.MapGeneration
                 SourceCursor<IHallGenerator> hallGeneratorCursor = _hallGenerators.Pull(context);;
                 IHallGenerator hallGenerator = hallGeneratorCursor.Value;
 
-                if (!hallGenerator.CanGenerate(mapInfo, nextConnection.Position, hallEnd, rng))
+                if (!hallGenerator.CanGenerate(floor, nextConnection.Position, hallEnd, rng))
                     continue;
 
-                IRoom hall = hallGenerator.Generate(mapInfo, nextConnection.Position, hallEnd, rng);
+                IRoom hall = hallGenerator.Generate(floor, nextConnection.Position, hallEnd, rng);
                 hallGeneratorCursor.Use();
 
                 yield return mapInfo;
@@ -134,10 +134,10 @@ namespace SpellSword.MapGeneration
                 SourceCursor<IHallGenerator> hallGeneratorCursor = _hallGenerators.Pull(context); ;
                 IHallGenerator hallGenerator = hallGeneratorCursor.Value;
 
-                if (!hallGenerator.CanGenerate(mapInfo, nextConnection.Position, hit, rng))
+                if (!hallGenerator.CanGenerate(floor, nextConnection.Position, hit, rng))
                     continue;
 
-                IRoom hall = hallGenerator.Generate(mapInfo, nextConnection.Position, hit, rng);
+                IRoom hall = hallGenerator.Generate(floor, nextConnection.Position, hit, rng);
                 hallGeneratorCursor.Use();
 
 
@@ -156,7 +156,7 @@ namespace SpellSword.MapGeneration
 
             foreach (IRoom room in rooms)
             {
-                room.GeneratedBy.Populate(mapInfo, room, rng);
+                room.GeneratedBy.Populate(floor, room, rng);
                 int nextRNG = rng.Next();
                 Console.WriteLine($"Next random: {nextRNG}");
             }
@@ -215,8 +215,6 @@ namespace SpellSword.MapGeneration
 
         public void Populate(Floor floor, MapArea area, IGenerator rng)
         {
-            MapInfo mapInfo = floor.MapInfo;
-
             int areaCoefficient = (area.Count * rng.Next(10, 20)) / 1000;
 
             int numDecorators = Math.Max(1, areaCoefficient);
@@ -226,10 +224,10 @@ namespace SpellSword.MapGeneration
                 IAreaDecorator decorator = _decorators.Get(rng);
 
                 // Retry getting decorator if it cannot decorate the area
-                for (int i = 0; !decorator.CanDecorate(mapInfo, area) && i < DECORATION_RETRYS; i++)
+                for (int i = 0; !decorator.CanDecorate(floor, area) && i < DECORATION_RETRYS; i++)
                     decorator = _decorators.Get();
 
-                decorator.Decorate(mapInfo, area, rng);
+                decorator.Decorate(floor, area, rng);
             }
         }
     }

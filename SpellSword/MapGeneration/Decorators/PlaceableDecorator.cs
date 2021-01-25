@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using GoRogue.MapGeneration;
+using SpellSword.Game;
 using Troschuetz.Random;
 
 namespace SpellSword.MapGeneration
@@ -15,17 +16,17 @@ namespace SpellSword.MapGeneration
             Placeable = placeable;
         }
 
-        public void Decorate(MapInfo mapInfo, MapArea area, IGenerator rng)
+        public void Decorate(Floor floor, MapArea area, IGenerator rng)
         {
             MapArea restrictedArea = new MapArea();
 
             restrictedArea.Add(area.Positions);
             restrictedArea.Remove(area.Bounds.PerimeterPositions());
 
-            Placeable.Place(mapInfo, restrictedArea.RandomPosition(rng), rng);
+            Placeable.Place(floor, restrictedArea.RandomPosition(rng), rng);
         }
 
-        public bool CanDecorate(MapInfo mapInfo, MapArea area)
+        public bool CanDecorate(Floor floor, MapArea area)
         {
             return area.Count > 0;
         }

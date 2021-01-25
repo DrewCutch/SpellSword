@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using GoRogue.MapGeneration;
+using SpellSword.Game;
 using Troschuetz.Random;
 
 namespace SpellSword.MapGeneration.Decorators
@@ -21,7 +22,7 @@ namespace SpellSword.MapGeneration.Decorators
             MaxAmount = maxAmount;
         }
 
-        public void Decorate(MapInfo mapInfo, MapArea area, IGenerator rng)
+        public void Decorate(Floor floor, MapArea area, IGenerator rng)
         {
             MapArea restrictedArea = new MapArea();
 
@@ -33,12 +34,12 @@ namespace SpellSword.MapGeneration.Decorators
 
             while (amountPlaced < amount)
             {
-                if (Placeable.Place(mapInfo, restrictedArea.RandomPosition(rng), rng))
+                if (Placeable.Place(floor, restrictedArea.RandomPosition(rng), rng))
                     amountPlaced += 1;
             }
         }
 
-        public bool CanDecorate(MapInfo mapInfo, MapArea area)
+        public bool CanDecorate(Floor floor, MapArea area)
         {
             return area.Count > 0;
         }

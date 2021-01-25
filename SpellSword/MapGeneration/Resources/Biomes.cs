@@ -21,7 +21,7 @@ namespace SpellSword.MapGeneration.Resources
     static class Biomes
     {
         private static Spreader GrassSpreader = new Spreader(
-            (mapInfo, pos) =>
+            (floor, pos) =>
             {
                 GameObject grass = new GameObject(pos, Layers.Floor, null);
                 grass.AddComponent(new GlyphComponent('"', Color.DarkGreen));
@@ -33,7 +33,7 @@ namespace SpellSword.MapGeneration.Resources
 
         
         private static Spreader TallGrassSpreader = new Spreader(
-            (mapInfo, pos) =>
+            (floor, pos) =>
             {
                 GameObject grass = new GameObject(pos, Layers.Floor, null, isTransparent:false);
                 grass.AddComponent(new GlyphComponent('⌠', Color.DarkGreen));
@@ -45,18 +45,18 @@ namespace SpellSword.MapGeneration.Resources
 
         
         private static Spreader GlowingMushroomsSpreader = new Spreader(
-            (mapInfo, pos) =>
+            (floor, pos) =>
             {
                 GameObject grass = new GameObject(pos, Layers.Floor, null);
                 grass.AddComponent(new GlyphComponent('"', Color.Cyan));
-                grass.AddComponent(new LightSourceComponent(mapInfo.LightMap, new Light(Color.Cyan, new Coord(0,0), 3, 7)));
+                grass.AddComponent(new LightSourceComponent(floor.MapInfo.LightMap, new Light(Color.Cyan, new Coord(0,0), 3, 7)));
                 grass.AddComponent(new NameComponent(new Title("in", "", "mana mushrooms")));
 
                 return grass;
             }, 15, .8f, .8f);
 
         private static Spreader GlowingFungusSpreader = new Spreader(
-            (mapInfo, pos) =>
+            (floor, pos) =>
             {
                 int red = SingletonRandom.DefaultRNG.Next(220, 256);
                 int green = SingletonRandom.DefaultRNG.Next(50, 100);
@@ -65,7 +65,7 @@ namespace SpellSword.MapGeneration.Resources
 
                 GameObject grass = new GameObject(pos, Layers.Floor, null);
                 grass.AddComponent(new GlyphComponent('"', color));
-                grass.AddComponent(new LightSourceComponent(mapInfo.LightMap, new Light(color, new Coord(0, 0), 4, 10)));
+                grass.AddComponent(new LightSourceComponent(floor.MapInfo.LightMap, new Light(color, new Coord(0, 0), 4, 10)));
                 grass.AddComponent(new NameComponent(new Title("in", "", "fire fungus")));
 
                 return grass;
@@ -73,13 +73,13 @@ namespace SpellSword.MapGeneration.Resources
 
 
         private static IPlaceable TorchPlacer = new Placable(
-            (mapInfo, pos) =>
+            (floor, pos) =>
         {
             Coord wallAway = new Coord(0, 0);
 
             foreach (Direction dir in AdjacencyRule.CARDINALS.DirectionsOfNeighbors())
             {
-                if (mapInfo.Map.Contains(pos + dir) && !(mapInfo.Map.Terrain[pos + dir]?.IsWalkable ?? false))
+                if (floor.MapInfo.Map.Contains(pos + dir) && !(floor.MapInfo.Map.Terrain[pos + dir]?.IsWalkable ?? false))
                 {
                     wallAway -= new Coord(dir.DeltaX, dir.DeltaY);
                 }
@@ -89,7 +89,7 @@ namespace SpellSword.MapGeneration.Resources
             {
                 foreach (Direction dir in AdjacencyRule.DIAGONALS.DirectionsOfNeighbors())
                 {
-                    if (mapInfo.Map.Contains(pos + dir) && !(mapInfo.Map.Terrain[pos + dir]?.IsWalkable ?? false))
+                    if (floor.MapInfo.Map.Contains(pos + dir) && !(floor.MapInfo.Map.Terrain[pos + dir]?.IsWalkable ?? false))
                     {
                         wallAway -= new Coord(dir.DeltaX, dir.DeltaY);
                     }
@@ -98,7 +98,7 @@ namespace SpellSword.MapGeneration.Resources
 
             GameObject torch = new GameObject(pos, Layers.Main, null);
             torch.AddComponent(new GlyphComponent('i', Color.OrangeRed));
-            torch.AddComponent(new LightSourceComponent(mapInfo.LightMap, new Light(Color.LightGoldenrodYellow, wallAway, 20, 25)));
+            torch.AddComponent(new LightSourceComponent(floor.MapInfo.LightMap, new Light(Color.LightGoldenrodYellow, wallAway, 20, 25)));
             torch.AddComponent(new NameComponent(new Title("over", "", "torch")));
 
             return torch;

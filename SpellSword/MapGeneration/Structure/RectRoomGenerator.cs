@@ -5,6 +5,7 @@ using GoRogue;
 using GoRogue.MapGeneration;
 using GoRogue.MapGeneration.Connectors;
 using GoRogue.Random;
+using SpellSword.Game;
 using SpellSword.MapGeneration.Decorators;
 using SpellSword.MapGeneration.Sources;
 using SpellSword.Util;
@@ -35,7 +36,7 @@ namespace SpellSword.MapGeneration.Structure
             NeighborPossibilities = new PrioritySource<GenerationContext, IRoomGenerator>(false);
         }
 
-        public IRoom Generate(MapInfo mapInfo, RoomConnection connectAt, IGenerator rng)
+        public IRoom Generate(Floor floor, RoomConnection connectAt, IGenerator rng)
         {
             Rectangle roomBounds = new Rectangle(0, 0, rng.Next(_minBounds.Width, _maxBounds.Width), rng.Next(_minBounds.Height, _maxBounds.Height));
 
@@ -54,12 +55,12 @@ namespace SpellSword.MapGeneration.Structure
 
             foreach (Coord pos in roomBounds.PerimeterPositions())
             {
-                _wall.Place(mapInfo, pos, rng);
+                _wall.Place(floor, pos, rng);
             }
 
             foreach (Coord pos in roomBounds.ChangeSize(-2, -2).WithCenter(roomBounds.Center).Positions())
             {
-                _floor.Place(mapInfo, pos, rng);
+                _floor.Place(floor, pos, rng);
             }
 
             MapArea area = new MapArea();
@@ -87,12 +88,12 @@ namespace SpellSword.MapGeneration.Structure
             }
 
             if(connectAt.Position != Coord.NONE)
-                _floor.Place(mapInfo, connectAt.Position, rng);
+                _floor.Place(floor, connectAt.Position, rng);
 
             return new BasicRoom(area, connections, this);
         }
 
-        public bool CanGenerate(MapInfo mapInfo, RoomConnection connectAt, IGenerator rng)
+        public bool CanGenerate(Floor floor, RoomConnection connectAt, IGenerator rng)
         {
             Rectangle roomBounds = new Rectangle(0, 0, rng.Next(_minBounds.Width, _maxBounds.Width), rng.Next(_minBounds.Height, _maxBounds.Height));
 
@@ -107,10 +108,10 @@ namespace SpellSword.MapGeneration.Structure
 
             roomBounds = roomBounds.WithPosition(offset + connectAt.Position);
 
-            return mapInfo.Map.Terrain.AllEmpty(roomBounds.Positions());
+            return floor.MapInfo.Map.Terrain.AllEmpty(roomBounds.Positions());
         }
 
-        public List<Hook> Populate(MapInfo mapInfo, IRoom room, IGenerator rng)
+        public List<Hook> Populate(Floor floor, IRoom room, IGenerator rng)
         {
             Source<GenerationContext, IAreaDecorator> individualSource = Decorators.Clone();
 
@@ -125,10 +126,10 @@ namespace SpellSword.MapGeneration.Structure
 
                 SourceCursor<IAreaDecorator> decoratorCursor = individualSource.Pull(new GenerationContext(rng));
 
-                if (!decoratorCursor.Value.CanDecorate(mapInfo, room.Area)) 
+                if (!decoratorCursor.Value.CanDecorate(floor, room.Area)) 
                     continue;
 
-                decoratorCursor.Value.Decorate(mapInfo, room.Area, rng);
+                decoratorCursor.Value.Decorate(floor, room.Area, rng);
                 
                 decoratorCursor.Use();
             }

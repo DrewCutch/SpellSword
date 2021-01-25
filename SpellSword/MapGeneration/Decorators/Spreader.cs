@@ -7,6 +7,7 @@ using GoRogue.GameFramework;
 using GoRogue.Pathing;
 using GoRogue.Random;
 using Priority_Queue;
+using SpellSword.Game;
 using Troschuetz.Random;
 
 namespace SpellSword.MapGeneration
@@ -24,9 +25,9 @@ namespace SpellSword.MapGeneration
         public float DeadChance { get; }
 
 
-        private Func<MapInfo, Coord, GameObject> _generator;
+        private Func<Floor, Coord, GameObject> _generator;
 
-        public Spreader(Func<MapInfo, Coord, GameObject> generator, int startingEnergy, float spreadChance, float deadChance)
+        public Spreader(Func<Floor, Coord, GameObject> generator, int startingEnergy, float spreadChance, float deadChance)
         {
             _generator = generator;
 
@@ -35,7 +36,7 @@ namespace SpellSword.MapGeneration
             DeadChance = deadChance;
         }
 
-        public bool Place(MapInfo mapInfo, Coord pos, IGenerator rng)
+        public bool Place(Floor floor, Coord pos, IGenerator rng)
         {
             int energy = StartingEnergy;
 
@@ -58,9 +59,9 @@ namespace SpellSword.MapGeneration
                     continue;
                 }
 
-                GameObject obj = _generator(mapInfo, next);
+                GameObject obj = _generator(floor, next);
 
-                if (!mapInfo.Map.IsWalkable(next) || !mapInfo.Map.AddEntity(obj)) 
+                if (!floor.MapInfo.Map.IsWalkable(next) || !floor.MapInfo.Map.AddEntity(obj)) 
                     continue;
 
                 explored.Add(next);
