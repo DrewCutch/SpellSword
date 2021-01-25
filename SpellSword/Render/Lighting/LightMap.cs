@@ -19,7 +19,7 @@ namespace SpellSword.Render.Lighting
             {
                 for (int j = 0; j < map.Height; j++)
                 {
-                    map[i, j] = Color.FromArgb(50, 50, 50);
+                    map[i, j] = Color.FromArgb(60, 60, 60);
                 }
             }
         }

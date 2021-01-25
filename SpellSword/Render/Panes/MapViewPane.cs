@@ -104,7 +104,7 @@ namespace SpellSword.Render.Panes
                         if(_visibilityMap[x + Offset.X, y + Offset.Y])
                             writeContext.WriteGlyph(y, x, glyph.SelfLit ? glyph.Glyph : glyph.Glyph.MultipliedByColor(_lightMap[x + Offset.X, y + Offset.Y]));
                         else
-                            writeContext.WriteGlyph(y, x, glyph.Glyph.MultipliedByColor(Color.FromArgb(50, 50, 50)));
+                            writeContext.WriteGlyph(y, x, glyph.Glyph.MultipliedByColor(_lightMap[x + Offset.X, y + Offset.Y]).MultipliedByColor(Color.FromArgb(150, 150, 150)));
                     }
                 }
 
