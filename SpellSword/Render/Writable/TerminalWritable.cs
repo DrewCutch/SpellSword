@@ -4,62 +4,63 @@ using System.Drawing;
 using System.Reflection.PortableExecutable;
 using System.Text;
 using BearLib;
+using GoRogue.Random;
 
 namespace SpellSword.Render
 {
-    class TerminalWritable: IWriteable
+    class TerminalWritable: Writeable
     {
-        public int Width { get; }
-        public int Height { get; }
-        public bool Dirty { get; set; }
+        public override bool Dirty { get; set; }
         public int Layer { get; }
 
-        public TerminalWritable(int width, int height, int layer)
+        public TerminalWritable(int width, int height, int layer): base(width, height)
         {
-            Width = width;
-            Height = height;
             Layer = layer;
             Dirty = true;
         }
 
-        public void SetGlyph(int row, int col, Glyph glyph)
+        public override void SetCharacter(int row, int col, int character, Color color, Color? backgroundColor)
         {
             Terminal.Layer(Layer);
 
             Terminal.Composition(false);
 
-            if (glyph.BackgroundColor is Color backgroundColor)
+            if (backgroundColor is Color _backgroundColor)
             {
-                Terminal.Color(backgroundColor);
+                Terminal.Color(_backgroundColor);
                 Terminal.Put(col, row, '█');
                 Terminal.Composition(true);
             }
 
-            Terminal.Color(glyph.Color);
-            Terminal.Put(col, row, glyph.Character);
+            Terminal.Color(color);
+            Terminal.Put(col, row, character);
 
             Dirty = true;
         }
 
-        public void WriteGlyph(int row, int col, Glyph glyph)
+        public override void WriteCharacter(int row, int col, int character, Color color, Color? backgroundColor)
         {
             Terminal.Layer(Layer);
 
             Terminal.Composition(true);
 
-            if (glyph.BackgroundColor is Color backgroundColor)
+            if (backgroundColor is Color _backgroundColor)
             {
-                Terminal.Color(backgroundColor);
-                Terminal.Put(col, row, '█');
+                Terminal.Color(_backgroundColor);
+                if(character > 0xE000)
+                    Terminal.Put(col, row, 'a'  + 122 + 0xE000);
+                else
+                    Terminal.Put(col, row, '█');
             }
 
-            Terminal.Color(glyph.Color);
-            Terminal.Put(col, row, glyph.Character);
+            Terminal.Color(color);
+
+            Terminal.Put(col, row, character);
 
             Dirty = true;
         }
 
-        public void Clear(GoRogue.Rectangle bounds)
+        public override void Clear(GoRogue.Rectangle bounds)
         {
             Terminal.Layer(Layer);
             Terminal.ClearArea(bounds);

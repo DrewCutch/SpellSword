@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Text;
 using BearLib;
 using SpellSword.Input;
+using SpellSword.Render.Fonts;
 using SpellSword.Render.Panes;
 using SpellSword.Render.Particles;
 using Rectangle = GoRogue.Rectangle;
@@ -32,9 +33,9 @@ namespace SpellSword.Render
             }
         }
 
-        private IWriteable _backgroundWritable;
-        private IWriteable _writable;
-        private IWriteable _particleWritable;
+        private Writeable _backgroundWritable;
+        private Writeable _writable;
+        private Writeable _particleWritable;
 
         private HashSet<IParticleEffect> _particleEffects;
 
@@ -97,13 +98,16 @@ namespace SpellSword.Render
 
         private void PaintParticles()
         {
-            ((IWriteable)_particleWritable).Clear();
+            _particleWritable.Clear();
+
+            Writeable particleGrid = new TextWriteContext(_particleWritable, Typeface.Grid);
 
             foreach (IParticleEffect effect in _particleEffects)
             {
                 foreach (Particle particle in effect.Particles())
                 {
-                    _particleWritable.WriteGlyph(particle.Pos.Y + 1, particle.Pos.X, particle.Glyph);
+                    //_particleWritable.WriteGlyph(particle.Pos.Y + 1, particle.Pos.X, particle.Glyph);
+                    particleGrid.WriteGlyph(particle.Pos.Y + 1, particle.Pos.X, particle.Glyph);
                 }
             }
         }

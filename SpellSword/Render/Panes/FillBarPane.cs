@@ -44,7 +44,7 @@ namespace SpellSword.Render.Panes
             
         }
 
-        public override bool Paint(IWriteable writeContext)
+        public override bool Paint(Writeable writeContext)
         {
             if (!Dirty)
                 return false;
@@ -55,7 +55,7 @@ namespace SpellSword.Render.Panes
 
             writeContext.Clear();
             for (int i = 0; i < cap; i++)
-                writeContext.SetGlyph(0, i, new Glyph(i < Label.Length ? Label[i] : ' ', _fillColor.Inverted(), i < fill ? _fillColor : _capacityColor));
+                writeContext.SetGlyph(0, i, new Glyph(i < Label.Length ? (Characters) Label[i] : Characters.SPACE, _fillColor.Inverted(), i < fill ? _fillColor : _capacityColor));
 
             Dirty = false;
             return true;

@@ -1,25 +1,42 @@
 ﻿using System;
 using System.Collections.Generic;
-using GoRogue;
+using System.Drawing;
+using Rectangle = GoRogue.Rectangle;
 
 namespace SpellSword.Render
 {
-    interface IWriteable
+    public abstract class Writeable
     {
-        int Width { get; }
-        int Height { get; }
+        public int Width { get; }
+        public int Height { get; }
 
-        bool Dirty { get; set; }
+        public virtual bool Dirty { get; set; }
 
-        void SetGlyph(int row, int col, Glyph glyph);
+        protected Writeable(int width, int height)
+        {
+            Width = width;
+            Height = height;
+        }
 
-        void WriteGlyph(int row, int col, Glyph glyph);
+        public void SetGlyph(int row, int col, Glyph glyph)
+        {
+            SetCharacter(row, col, (int) glyph.Character, glyph.Color, glyph.BackgroundColor);
+        }
+
+        public abstract void SetCharacter(int row, int col, int character, Color color, Color? backgroundColor);
+
+        public void WriteGlyph(int row, int col, Glyph glyph)
+        {
+            WriteCharacter(row, col, (int) glyph.Character, glyph.Color, glyph.BackgroundColor);
+        }
+
+        public abstract void WriteCharacter(int row, int col, int character, Color color, Color? backgroundColor);
 
         public void Clear()
         {
             Clear(new Rectangle(0,0,Width, Height));
         }
 
-        public void Clear(Rectangle bounds);
+        public abstract void Clear(Rectangle bounds);
     }
 }

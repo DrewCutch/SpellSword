@@ -22,6 +22,10 @@ namespace SpellSword.Render
 
             Terminal.Set(options);
 
+            Terminal.Set("0xE000: Content\\terminal16x16_gs_ro.png, size=16x16, spacing=2x1, transparent=black");//polyducks_12x12
+
+            //Terminal.Set("font: Content\\polyducks_12x12.png, size=12x12, resize=6x12, codepage=437, spacing=1x1, resize-filter=bicubic");
+
             Terminal.Refresh();
 
             _root = root.Root;

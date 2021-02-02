@@ -196,7 +196,7 @@ namespace SpellSword.MapGeneration
         private static IGameObject SolidRock(Coord pos)
         {
             IGameObject wall = new GameObject(pos, Layers.Terrain, null, true, false, false);
-            wall.AddComponent(new GlyphComponent(new Glyph('#', Color.Black, Color.Black)));
+            wall.AddComponent(new GlyphComponent(new Glyph(Characters.POUND_SIGN, Color.Black, Color.Black)));
             wall.AddComponent(new NameComponent(new Title("", "solid rock")));
 
             return wall;
@@ -205,7 +205,7 @@ namespace SpellSword.MapGeneration
         private static IGameObject Exit(Floor floor, Coord pos)
         {
             IGameObject exit = new GameObject(pos, Layers.Terrain, null, true, true, true);
-            exit.AddComponent(new GlyphComponent(new Glyph('>', Color.Yellow, Color.DarkGoldenrod)));
+            exit.AddComponent(new GlyphComponent(new Glyph(Characters.GREATER_THAN, Color.Yellow, Color.DarkGoldenrod)));
             exit.AddComponent(new NameComponent(new Title("the", "exit")));
             exit.AddComponent(new TriggerComponent((gameobject, dir) => { floor.MessageBus.Send(new FloorTransitionEvent(gameobject, floor.Index, floor.Index + 1)); }, (_, __) => { }));
             exit.AddComponent(new LightSourceComponent(floor.MapInfo.LightMap, new Light(Color.Yellow, new Coord(0,0), 3, 5)));

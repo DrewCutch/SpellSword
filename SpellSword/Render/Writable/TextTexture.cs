@@ -7,19 +7,12 @@ using Rectangle = GoRogue.Rectangle;
 
 namespace SpellSword.Render
 {
-    public class TextTexture: IWriteable
+    public class TextTexture: Writeable
     {
-        public int Width { get; }
-        public int Height { get; }
-
         public readonly Glyph[][] Contents;
 
-        public bool Dirty { get; set; }
-
-        public TextTexture(int width, int height)
+        public TextTexture(int width, int height): base(width, height)
         {
-            Width = width;
-            Height = height;
             Dirty = false;
 
             Contents = new Glyph[height][];
@@ -29,25 +22,22 @@ namespace SpellSword.Render
             }
         }
 
-        public void WriteGlyph(int row, int col, Glyph glyph)
+        public override void WriteCharacter(int row, int col, int character, Color color, Color? backgroundColor)
         {
-            SetGlyph(row, col, glyph);
+            SetCharacter(row, col, character, color, backgroundColor);
         }
 
-        public void Clear(Rectangle bounds)
+        public override void Clear(Rectangle bounds)
         {
             for (int i = bounds.MinExtentY; i < bounds.MaxExtentY; i++)
                 for (int j = bounds.MinExtentX; j < bounds.MaxExtentX; j++)
                     SetGlyph(i, j, Glyph.Blank);
         }
 
-        public void SetGlyph(int row, int col, Glyph g)
+        public override void SetCharacter(int row, int col, int character, Color color, Color? backgroundColor)
         {
-            if (Contents[row][col] == g)
-                return;
-
             Dirty = true;
-            Contents[row][col] = g;
+            Contents[row][col] = new Glyph((Characters) character, color, backgroundColor);
         }
 
 

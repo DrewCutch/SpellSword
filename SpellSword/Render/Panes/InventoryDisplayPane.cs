@@ -59,7 +59,7 @@ namespace SpellSword.Render.Panes
             _stackPane.SuggestWidth(width);
         }
 
-        public override bool Paint(IWriteable writeContext)
+        public override bool Paint(Writeable writeContext)
         {
             return _stackPane.Paint(writeContext);
         }
@@ -152,7 +152,7 @@ namespace SpellSword.Render.Panes
                 Dirty = true;
             }
 
-            public override bool Paint(IWriteable writeContext)
+            public override bool Paint(Writeable writeContext)
             {
                 if (!Dirty)
                     return false;
@@ -288,7 +288,7 @@ namespace SpellSword.Render.Panes
                 Dirty = true;
             }
 
-            public override bool Paint(IWriteable writeContext)
+            public override bool Paint(Writeable writeContext)
             {
                 if (!Dirty)
                     return false;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Reflection;
+using System.Text;
 using Artemis.Utils;
 using BearLib;
 using GoRogue;
@@ -54,7 +55,7 @@ namespace SpellSword
             MessageBus mainBus = new MessageBus();
 
             IMapGenerator generator = new MapGenerator(timeline, mainBus);
-            IEnumerator<MapInfo> generationSteps = generator.GenerationSteps(120, 40, "" + SingletonRandom.DefaultRNG.Next()).GetEnumerator();
+            IEnumerator<MapInfo> generationSteps = generator.GenerationSteps(60, 40, "" + SingletonRandom.DefaultRNG.Next()).GetEnumerator();
             generationSteps.MoveNext();
 
             
@@ -194,7 +195,7 @@ namespace SpellSword
 
             Actor playerActor = new Actor(playerBeing, control, mainBus);
             player.AddComponent(playerActor);
-            player.AddComponent(new GlyphComponent(new Glyph('@', Color.Aqua)));
+            player.AddComponent(new GlyphComponent(new Glyph(Characters.AT, Color.Aqua)));
             player.AddComponent(new LightSourceComponent(lightMap, new Light(Color.Aqua, Coord.NONE, 4, 8)));
             player.AddComponent(new FOVExplorerComponent());
 
@@ -239,21 +240,21 @@ namespace SpellSword
             root.AddChild(mapAndConsole, 4);
             root.AddChild(statusBars, 1);
 
-            Window rootWindow = new Window(root, new Rectangle(0, 0, 180, 50), 0);
+            Window rootWindow = new Window(root, new Rectangle(0, 0, 160, 50), 0);
 
-            BearTermRenderer renderer = new BearTermRenderer(rootWindow, "window.title='Spell Sword'; window.size=180x50; window.resizeable=true; input.filter=[keyboard+, mouse+, arrows+]");
+            BearTermRenderer renderer = new BearTermRenderer(rootWindow, "window.title='Spell Sword'; window.size=160x50; window.resizeable=true; input.filter=[keyboard+, mouse+, arrows+]");
             mainBus.RegisterSubscriber<ParticleEvent>(renderer);
             mainBus.RegisterSubscriber<WindowEvent>(renderer);
 
             //WindowRouter windowRouter = new WindowRouter();
-            //windowRouter.Handle(WindowEvent.Open(root, new Rectangle(0, 0, 180, 50)));
+            //windowRouter.Handle(WindowEvent.Open(root, new Rectangle(0, 0, 160, 50)));
             //mainBus.RegisterSubscriber(windowRouter);
 
             GameControlConsumer gameControlConsumer = new GameControlConsumer(joystickConfig, mainBus, viewPane);
 
             BearTermInputRouter inputRouter = new BearTermInputRouter(gameControlConsumer);
             mainBus.RegisterSubscriber(inputRouter);
-            inputRouter.Handle(WindowEvent.Open(root, new Rectangle(0, 0, 180, 50)));
+            inputRouter.Handle(WindowEvent.Open(root, new Rectangle(0, 0, 160, 50)));
 
 
             GoalMapStore goalMapStore = new GoalMapStore(map);
@@ -295,7 +296,7 @@ namespace SpellSword
         {
             MessageBus gameBus = new MessageBus();
 
-            Dungeon dungeon = new Dungeon(gameBus, new Rectangle(0, 0, 120, 40), Source.From<GenerationContext, IBiome>(Biomes.TestBiome), "hello");
+            Dungeon dungeon = new Dungeon(gameBus, new Rectangle(0, 0, 60, 40), Source.From<GenerationContext, IBiome>(Biomes.TestBiome), "testseed");
 
 
             JoystickConfig joystickConfig = new JoystickConfig
@@ -317,7 +318,7 @@ namespace SpellSword
             // Creating Player
             GameObject player = new UpdatingGameObject(new Coord(20, 20), Layers.Main, null, initialFloor.Timeline);
 
-            Being playerBeing = new Being(new SelectedAttributes(new AttributeSet(10, 10, 10, 10, 10)), Alignment.PlayerAlignment, new EquipmentSlotSet(), 10, "You");
+            Being playerBeing = new Being(new SelectedAttributes(new AttributeSet(6, 7, 7, 8, 8)), Alignment.PlayerAlignment, new EquipmentSlotSet(), 10, "You");
 
             playerBeing.Equipment.Equip(new MeleeWeapon(new Damage(10)), EquipmentSlot.RightHandEquip);
 
@@ -327,7 +328,7 @@ namespace SpellSword
 
             Actor playerActor = new Actor(playerBeing, control, gameBus);
             player.AddComponent(playerActor);
-            player.AddComponent(new GlyphComponent(new Glyph('@', Color.Aqua)));
+            player.AddComponent(new GlyphComponent(new Glyph(Characters.AT, Color.Aqua)));
             player.AddComponent(new LightSourceComponent(initialFloor.MapInfo.LightMap, new Light(Color.Aqua, Coord.NONE, 4, 5)));
             player.AddComponent(new FOVExplorerComponent());
 
@@ -390,28 +391,28 @@ namespace SpellSword
             root.AddChild(mapAndConsole, 4);
             root.AddChild(statusBars, 1);
 
-            Window rootWindow = new Window(root, new Rectangle(0, 0, 180, 50), 0);
+            Window rootWindow = new Window(root, new Rectangle(0, 0, 160, 50), 0);
 
-            BearTermRenderer renderer = new BearTermRenderer(rootWindow, "window.title='Spell Sword'; window.size=180x50; window.resizeable=true; input.filter=[keyboard+, mouse+, arrows+]");
+            BearTermRenderer renderer = new BearTermRenderer(rootWindow, "window.title='Spell Sword'; window.size=160x50; window.resizeable=true; input.filter=[keyboard+, mouse+, arrows+]");
             gameBus.RegisterSubscriber<ParticleEvent>(renderer);
             gameBus.RegisterSubscriber<WindowEvent>(renderer);
 
             //WindowRouter windowRouter = new WindowRouter();
-            //windowRouter.Handle(WindowEvent.Open(root, new Rectangle(0, 0, 180, 50)));
+            //windowRouter.Handle(WindowEvent.Open(root, new Rectangle(0, 0, 160, 50)));
             //mainBus.RegisterSubscriber(windowRouter);
 
             GameControlConsumer gameControlConsumer = new GameControlConsumer(joystickConfig, gameBus, mapViewPane);
 
             BearTermInputRouter inputRouter = new BearTermInputRouter(gameControlConsumer);
             gameBus.RegisterSubscriber(inputRouter);
-            inputRouter.Handle(WindowEvent.Open(root, new Rectangle(0, 0, 180, 50)));
+            inputRouter.Handle(WindowEvent.Open(root, new Rectangle(0, 0, 160, 50)));
 
 
 
             for (int i = 1; i < 5; i++)
             {
-                //GameObject goblin = TestUtil.CreateGoblin((5 + i, 5 + i % 2 + 1), playerActor, timeline, goalMapStore, mainBus);
-                //map.AddEntity(goblin);
+                //GameObject goblin = TestUtil.CreateGoblin((5 + i, 5 + i % 2 + 1), playerActor, initialFloor.Timeline, initialFloor.GoalMapStore, initialFloor.MessageBus);
+                //initialFloor.MapInfo.Map.AddEntity(goblin);
             }
 
             initialFloor.MapInfo.Map.AddEntity(player);

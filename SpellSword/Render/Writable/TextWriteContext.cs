@@ -1,60 +1,40 @@
 ﻿using System;
-using GoRogue;
+using System.Drawing;
+using SpellSword.Render.Fonts;
+using Rectangle = GoRogue.Rectangle;
 
 namespace SpellSword.Render
 {
-    class TextWriteContext: IWriteable
+    class TextWriteContext: Writeable
     {
-        public int Width { get; }
-        public int Height { get; }
-
-        public bool Dirty
+        public override bool Dirty
         {
             get => _writeable.Dirty;
-            set => _writeable.Dirty = Dirty;
+            set => _writeable.Dirty = value;
 
         }
 
         private readonly int _colOffset;
         private readonly int _rowOffset;
 
-        private readonly IWriteable _writeable;
+        private readonly Typeface _typeface;
 
-        public TextWriteContext(IWriteable writeable)
+        private readonly Writeable _writeable;
+
+        public TextWriteContext(Writeable writeable, int width, int height, int col, int row, Typeface typeface): base(width / typeface.Width, height)
         {
             _writeable = writeable;
-            Width = writeable.Width;
-            Height = writeable.Height;
-        }
-
-        public TextWriteContext(IWriteable writeable, int width, int height)
-        {
-            _writeable = writeable;
-            Width = width;
-            Height = height;
-        }
-
-        public TextWriteContext(IWriteable writeable, int width, int height, int col, int row)
-        {
-            _writeable = writeable;
-            Width = width;
-            Height = height;
             _colOffset = col;
             _rowOffset = row;
+            _typeface = typeface;
         }
 
-        public void SetGlyph(int row, int col, Glyph g)
-        {
-            if(row >= Height || row < 0)
-                throw new ArgumentOutOfRangeException(nameof(row));
+        public TextWriteContext(Writeable writeable, Typeface typeface) : this(writeable, writeable.Width, writeable.Height, 0, 0, typeface) { }
 
-            if (col >= Width || col < 0)
-                throw new ArgumentOutOfRangeException(nameof(col));
+        public TextWriteContext(Writeable writeable, int width, int height, int col, int row) : this(writeable, width, height, col, row, Typeface.Text) { }
 
-            _writeable.SetGlyph(_rowOffset + row, _colOffset + col, g);
-        }
 
-        public void WriteGlyph(int row, int col, Glyph g)
+        public override void SetCharacter(int row, int col, int character, Color color, Color? backgroundColor)
         {
             if (row >= Height || row < 0)
                 throw new ArgumentOutOfRangeException(nameof(row));
@@ -62,10 +42,25 @@ namespace SpellSword.Render
             if (col >= Width || col < 0)
                 throw new ArgumentOutOfRangeException(nameof(col));
 
-            _writeable.WriteGlyph(_rowOffset + row, _colOffset + col, g);
+            col *= _typeface.Width;
+
+            _writeable.SetCharacter(_rowOffset + row, _colOffset + col, _typeface.GetCharacter(character), color, backgroundColor);
         }
 
-        public void Clear(Rectangle bounds)
+        public override void WriteCharacter(int row, int col, int character, Color color, Color? backgroundColor)
+        {
+            if (row >= Height || row < 0)
+                throw new ArgumentOutOfRangeException(nameof(row));
+
+            if (col >= Width || col < 0)
+                throw new ArgumentOutOfRangeException(nameof(col));
+
+            col *= _typeface.Width;
+
+            _writeable.WriteCharacter(_rowOffset + row, _colOffset + col, _typeface.GetCharacter(character), color, backgroundColor);
+        }
+
+        public override void Clear(Rectangle bounds)
         {
             _writeable.Clear(bounds.Translate(_colOffset, _rowOffset));
         }

@@ -10,6 +10,7 @@ using GoRogue.Messaging;
 using SpellSword.Actors;
 using SpellSword.Engine;
 using SpellSword.Input;
+using SpellSword.Render.Fonts;
 using SpellSword.Render.Lighting;
 
 namespace SpellSword.Render.Panes
@@ -86,25 +87,28 @@ namespace SpellSword.Render.Panes
             Dirty = true;
         }
 
-        public override bool Paint(IWriteable writeContext)
+        public override bool Paint(Writeable writeContext)
         {
             if (!Dirty || _map == null)
                 return false;
 
             writeContext.Clear();
 
-            for (int x = 0; x < writeContext.Width && x + Offset.X < GlyphMapView.Width; x++)
-                for (int y = 0; y < writeContext.Height && y + Offset.Y < GlyphMapView.Height; y++)
+            Writeable gridWriteable = new TextWriteContext(writeContext, Typeface.Grid);
+
+            for (int x = 0; x < gridWriteable.Width && x + Offset.X < GlyphMapView.Width; x++)
+                for (int y = 0; y < gridWriteable.Height && y + Offset.Y < GlyphMapView.Height; y++)
                 {
                     if (!_exploredMap[x + Offset.X, y + Offset.Y])
                         continue;
 
                     foreach (GlyphRenderTranslationMap.MapGlyph glyph in GlyphMapView[x + Offset.X, y + Offset.Y])
                     {
+                        
                         if(_visibilityMap[x + Offset.X, y + Offset.Y])
-                            writeContext.WriteGlyph(y, x, glyph.SelfLit ? glyph.Glyph : glyph.Glyph.MultipliedByColor(_lightMap[x + Offset.X, y + Offset.Y]));
+                            gridWriteable.WriteGlyph(y, x, glyph.SelfLit ? glyph.Glyph : glyph.Glyph.MultipliedByColor(_lightMap[x + Offset.X, y + Offset.Y]));
                         else
-                            writeContext.WriteGlyph(y, x, glyph.Glyph.MultipliedByColor(_lightMap[x + Offset.X, y + Offset.Y]).MultipliedByColor(Color.FromArgb(150, 150, 150)));
+                            gridWriteable.WriteGlyph(y, x, glyph.Glyph.MultipliedByColor(_lightMap[x + Offset.X, y + Offset.Y]).MultipliedByColor(Color.FromArgb(150, 150, 150)));
                     }
                 }
 

@@ -19,15 +19,13 @@ namespace SpellSword.Actors.Action
 {
     class MeleeWeapon: Item, IUsable
     {
-        public EquipmentSlotKind SlotKind => EquipmentSlotKind.Hand;
-
         public int Range { get; }
         public Distance RangeDistanceType => Distance.MANHATTAN;
         private Damage _damage { get; }
 
         private readonly int _stamina;
 
-        public MeleeWeapon(Damage damage, int range = 1) : base(new Title("a", "sword"), "a dull blade", new Glyph('|', Color.Silver), EquipmentSlotKind.Hand, 1)
+        public MeleeWeapon(Damage damage, int range = 1) : base(new Title("a", "sword"), "a dull blade", new Glyph(Characters.VERTICAL_LINE, Color.Silver), EquipmentSlotKind.Hand, 1)
         {
             _damage = damage;
             Range = range;
@@ -46,14 +44,14 @@ namespace SpellSword.Actors.Action
 
             if (effectTarget != null)
             {
-                by.MainBus.Send(new ParticleEvent(new GlyphFlash(new Glyph('/', Color.Red), 200,
+                by.MainBus.Send(new ParticleEvent(new GlyphFlash(new Glyph(Characters.SLASH, Color.Red), 200,
                     target)));
 
                 by.MainBus.Send(new LogMessage($"{{0}} attacked with their {Title.Name}", new LogLink(by.Being.Name, Color.Aquamarine, by)));
             }
             else
             {
-                by.MainBus.Send(new ParticleEvent(new GlyphFlash(new Glyph('█', Color.FromArgb(100, Color.Gray)), 200,
+                by.MainBus.Send(new ParticleEvent(new GlyphFlash(new Glyph(Characters.FULL_BLOCK, Color.FromArgb(100, Color.Gray)), 200,
                     target)));
                 by.MainBus.Send(new LogMessage($"{{0}} missed with their {Title.Name}", new LogLink(by.Being.Name, Color.Aquamarine, by)));
             }

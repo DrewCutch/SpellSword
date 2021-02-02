@@ -7,16 +7,15 @@ namespace SpellSword.Render
 {
     public class Glyph
     {
-        public static Glyph Blank => new Glyph(' ', Color.Black);
+        public static Glyph Blank => new Glyph(Characters.SPACE, Color.Black);
 
-        public char Character { get;}
+        public Characters Character { get;}
         public Color Color { get; }
-
         public Color? BackgroundColor { get;}
 
         public int Alpha => Color.A;
 
-        public Glyph(char character, Color color, Color? backgroundColor = null)
+        public Glyph(Characters character, Color color, Color? backgroundColor = null)
         {
             Character = character;
             Color = color;
@@ -26,7 +25,7 @@ namespace SpellSword.Render
         public Glyph(Color color)
         {
             Color = color;
-            Character = '█';
+            Character = Characters.FULL_BLOCK;
         }
     }
 }

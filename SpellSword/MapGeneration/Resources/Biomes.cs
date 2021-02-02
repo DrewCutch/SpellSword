@@ -24,7 +24,7 @@ namespace SpellSword.MapGeneration.Resources
             (floor, pos) =>
             {
                 GameObject grass = new GameObject(pos, Layers.Floor, null);
-                grass.AddComponent(new GlyphComponent('"', Color.DarkGreen));
+                grass.AddComponent(new GlyphComponent(Characters.QUOTATION_MARK, Color.DarkGreen));
                 grass.AddComponent(new NameComponent(new Title("in", "", "grass")));
 
                 return grass;
@@ -36,7 +36,7 @@ namespace SpellSword.MapGeneration.Resources
             (floor, pos) =>
             {
                 GameObject grass = new GameObject(pos, Layers.Floor, null, isTransparent:false);
-                grass.AddComponent(new GlyphComponent('⌠', Color.DarkGreen));
+                grass.AddComponent(new GlyphComponent(Characters.TOP_HALF_INTEGRAL, Color.DarkGreen));
                 grass.AddComponent(new NameComponent(new Title("in", "", "tall grass")));
 
                 return grass;
@@ -48,7 +48,7 @@ namespace SpellSword.MapGeneration.Resources
             (floor, pos) =>
             {
                 GameObject grass = new GameObject(pos, Layers.Floor, null);
-                grass.AddComponent(new GlyphComponent('"', Color.Cyan));
+                grass.AddComponent(new GlyphComponent(Characters.QUOTATION_MARK, Color.Cyan));
                 grass.AddComponent(new LightSourceComponent(floor.MapInfo.LightMap, new Light(Color.Cyan, new Coord(0,0), 3, 7)));
                 grass.AddComponent(new NameComponent(new Title("in", "", "mana mushrooms")));
 
@@ -64,7 +64,7 @@ namespace SpellSword.MapGeneration.Resources
                 Color color = Color.FromArgb(red, green, blue);
 
                 GameObject grass = new GameObject(pos, Layers.Floor, null);
-                grass.AddComponent(new GlyphComponent('"', color));
+                grass.AddComponent(new GlyphComponent(Characters.QUOTATION_MARK, color));
                 grass.AddComponent(new LightSourceComponent(floor.MapInfo.LightMap, new Light(color, new Coord(0, 0), 4, 10)));
                 grass.AddComponent(new NameComponent(new Title("in", "", "fire fungus")));
 
@@ -97,7 +97,7 @@ namespace SpellSword.MapGeneration.Resources
             }
 
             GameObject torch = new GameObject(pos, Layers.Main, null);
-            torch.AddComponent(new GlyphComponent('i', Color.OrangeRed));
+            torch.AddComponent(new GlyphComponent(Characters.i, Color.OrangeRed));
             torch.AddComponent(new LightSourceComponent(floor.MapInfo.LightMap, new Light(Color.LightGoldenrodYellow, wallAway, 20, 25)));
             torch.AddComponent(new NameComponent(new Title("over", "", "torch")));
 
@@ -108,7 +108,7 @@ namespace SpellSword.MapGeneration.Resources
             (info, pos) =>
             {
                 IGameObject wall = new GameObject(pos, Layers.Terrain, null, true, false, false);
-                wall.AddComponent(new GlyphComponent(new Glyph('#', Color.DimGray, Color.DimGray)));
+                wall.AddComponent(new GlyphComponent(new Glyph(Characters.POUND_SIGN, Color.DimGray, Color.DimGray)));
                 wall.AddComponent(new NameComponent(new Title("a", "stone wall")));
 
                 return wall;
@@ -124,7 +124,7 @@ namespace SpellSword.MapGeneration.Resources
                 int blue = SingletonRandom.DefaultRNG.Next(15, 25);
                 Color tileColor = Color.FromArgb(green, green, green);
 
-                GlyphComponent glyphComponent = new GlyphComponent(new Glyph(' ', tileColor, tileColor));
+                GlyphComponent glyphComponent = new GlyphComponent(new Glyph(Characters.SPACE, tileColor, tileColor));
                 floor.AddComponent(glyphComponent);
                 floor.AddComponent(new DecalComponent());
                 floor.AddComponent(new NameComponent(new Title("a", "dirt floor")));

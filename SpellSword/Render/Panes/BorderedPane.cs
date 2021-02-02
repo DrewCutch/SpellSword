@@ -14,7 +14,7 @@ namespace SpellSword.Render.Panes
             _borderSet = borderSet;
         }
 
-        public override bool Paint(IWriteable writeContext)
+        public override bool Paint(Writeable writeContext)
         {
             throw new NotImplementedException();
             /*

@@ -55,7 +55,7 @@ namespace SpellSword.Render.Panes
             base.SuggestWidth(width);
         }
 
-        public override bool Paint(IWriteable writeContext)
+        public override bool Paint(Writeable writeContext)
         {
             bool childPainted = false;
 

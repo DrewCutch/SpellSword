@@ -9,7 +9,7 @@
             Fill = fill;
         }
 
-        public override bool Paint(IWriteable writeContext)
+        public override bool Paint(Writeable writeContext)
         {
             for (int i = 0; i < writeContext.Width; i++)
             {

@@ -27,7 +27,7 @@ namespace SpellSword.Render.Panes
             Dirty = true;
         }
 
-        public override bool Paint(IWriteable writeContext)
+        public override bool Paint(Writeable writeContext)
         {
             if (!Dirty)
                 return false;

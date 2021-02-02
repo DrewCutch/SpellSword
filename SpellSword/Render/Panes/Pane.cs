@@ -27,7 +27,7 @@ namespace SpellSword.Render.Panes
             Dirty = true;
         }
 
-        public abstract bool Paint(IWriteable writeContext);
+        public abstract bool Paint(Writeable writeContext);
         public virtual void OnMouseClick(Coord pos) { }
 
         public virtual void OnMouseMove(Coord last, Coord current) { }

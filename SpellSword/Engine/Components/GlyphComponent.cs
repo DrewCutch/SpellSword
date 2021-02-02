@@ -10,7 +10,7 @@ namespace SpellSword.Engine.Components
 
         public Glyph Glyph { get; set; }
 
-        public GlyphComponent(char character, Color color)
+        public GlyphComponent(Characters character, Color color)
         {
             Glyph = new Glyph(character, color);
         }

@@ -57,7 +57,7 @@ namespace SpellSword.Render.Panes
             ResizeChildren();
         }
 
-        public override bool Paint(IWriteable writeContext)
+        public override bool Paint(Writeable writeContext)
         {
             int xOffset = 0;
             int yOffset = 0;

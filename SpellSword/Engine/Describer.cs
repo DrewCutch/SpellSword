@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using GoRogue;
 using GoRogue.GameFramework;
 using GoRogue.MapViews;
 using GoRogue.Messaging;
@@ -29,9 +30,11 @@ namespace SpellSword.Engine
             if (!Map.Contains(message.NewPos))
                 return;
 
+            Coord gridPos = new Coord(message.NewPos.X / 2, message.NewPos.Y);
+
             bool first = true;
 
-            foreach (IGameObject gameObject in Map.GetObjects(message.NewPos))
+            foreach (IGameObject gameObject in Map.GetObjects(gridPos))
             {
                 if (gameObject.GetComponent<DecalComponent>() is DecalComponent decalComponent && decalComponent.Decal != null)
                 {

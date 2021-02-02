@@ -60,7 +60,7 @@ namespace SpellSword.MapGeneration
         private static IGameObject SolidRock(Coord pos)
         {
             IGameObject wall = new GameObject(pos, Layers.Terrain, null, true, false, false);
-            wall.AddComponent(new GlyphComponent(new Glyph('#', Color.Black, Color.Black)));
+            wall.AddComponent(new GlyphComponent(new Glyph(Characters.POUND_SIGN, Color.Black, Color.Black)));
             wall.AddComponent(new NameComponent(new Title("", "solid rock")));
 
             return wall;

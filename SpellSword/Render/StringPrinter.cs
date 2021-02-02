@@ -12,7 +12,7 @@ namespace SpellSword.Render
     class StringPrinter
     {
 
-        public static LinkPrint PrintLinkedText(LogMessage message, IWriteable writeable, int alpha, int x = 0, int y = 0)
+        public static LinkPrint PrintLinkedText(LogMessage message, Writeable writeable, int alpha, int x = 0, int y = 0)
         {
             Dictionary<Coord, ILinkable> linkMask = new Dictionary<Coord, ILinkable>();
             int width = writeable.Width;
@@ -57,7 +57,7 @@ namespace SpellSword.Render
             return int.Parse(str[1..^1]);
         }
 
-        public static Coord PrintColored(string str, IWriteable writeable, int x=0, int y=0, params Color[] colors)
+        public static Coord PrintColored(string str, Writeable writeable, int x=0, int y=0, params Color[] colors)
         {
             string[] colorZones = str.Split("[color]");
 
@@ -81,12 +81,12 @@ namespace SpellSword.Render
             return lastEnd;
         }
 
-        public static Coord Print(string str, IWriteable writeable, int x = 0, int y = 0)
+        public static Coord Print(string str, Writeable writeable, int x = 0, int y = 0)
         {
             return Print(str, writeable, Color.White, null, x, y);
         }
 
-        public static Coord Print(string str, IWriteable writeable, Color color, Color? backgroundColor = null, int x = 0, int y = 0)
+        public static Coord Print(string str, Writeable writeable, Color color, Color? backgroundColor = null, int x = 0, int y = 0)
         {
             string[] words = str.Split(' ');
             int width = writeable.Width;
@@ -113,11 +113,11 @@ namespace SpellSword.Render
             return new Coord(currentChar, currentLine);
         }
 
-        private static void UncheckedWrite(string str, int x, int y, IWriteable writeable, Color textColor, Color? backgroundColor)
+        private static void UncheckedWrite(string str, int x, int y, Writeable writeable, Color textColor, Color? backgroundColor)
         {
             for (int i = 0; i < str.Length; i++)
             {
-                writeable.SetGlyph(y, x + i, new Glyph(str[i], textColor, backgroundColor));
+                writeable.SetGlyph(y, x + i, new Glyph((Characters) str[i], textColor, backgroundColor));
             }
         }
     }
