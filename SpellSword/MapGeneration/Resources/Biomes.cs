@@ -20,7 +20,8 @@ namespace SpellSword.MapGeneration.Resources
 {
     static class Biomes
     {
-        private static Spreader GrassSpreader = new Spreader(
+        private static Spreader GrassSpreader = new Spreader( 
+            new Placable( 
             (floor, pos) =>
             {
                 GameObject grass = new GameObject(pos, Layers.Floor, null);
@@ -28,11 +29,13 @@ namespace SpellSword.MapGeneration.Resources
                 grass.AddComponent(new NameComponent(new Title("in", "", "grass")));
 
                 return grass;
-            },
+            }, 
+            Layers.Floor),
             100, .7f, .2f);
 
         
         private static Spreader TallGrassSpreader = new Spreader(
+            new Placable( 
             (floor, pos) =>
             {
                 GameObject grass = new GameObject(pos, Layers.Floor, null, isTransparent:false);
@@ -41,10 +44,12 @@ namespace SpellSword.MapGeneration.Resources
 
                 return grass;
             },
+            Layers.Floor),
             50, .7f, .1f);
 
         
         private static Spreader GlowingMushroomsSpreader = new Spreader(
+            new Placable( 
             (floor, pos) =>
             {
                 GameObject grass = new GameObject(pos, Layers.Floor, null);
@@ -53,9 +58,11 @@ namespace SpellSword.MapGeneration.Resources
                 grass.AddComponent(new NameComponent(new Title("in", "", "mana mushrooms")));
 
                 return grass;
-            }, 15, .8f, .8f);
+            }, Layers.Floor)
+            ,15, .8f, .8f);
 
         private static Spreader GlowingFungusSpreader = new Spreader(
+            new Placable( 
             (floor, pos) =>
             {
                 int red = SingletonRandom.DefaultRNG.Next(220, 256);
@@ -69,7 +76,9 @@ namespace SpellSword.MapGeneration.Resources
                 grass.AddComponent(new NameComponent(new Title("in", "", "fire fungus")));
 
                 return grass;
-            }, 15, .8f, .8f);
+            },
+            Layers.Floor),
+            15, .8f, .8f);
 
 
         private static IPlaceable TorchPlacer = new Placable(
@@ -102,7 +111,7 @@ namespace SpellSword.MapGeneration.Resources
             torch.AddComponent(new NameComponent(new Title("over", "", "torch")));
 
             return torch;
-        });
+        }, Layers.Main);
 
         private static IPlaceable WallPlaceable = new Placable(
             (info, pos) =>
@@ -112,7 +121,8 @@ namespace SpellSword.MapGeneration.Resources
                 wall.AddComponent(new NameComponent(new Title("a", "stone wall")));
 
                 return wall;
-            });
+            }, 
+            Layers.Terrain, true);
 
         private static IPlaceable FloorPlacable = new Placable(
             (info, pos) =>
