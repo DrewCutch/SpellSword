@@ -25,9 +25,9 @@ namespace SpellSword.MapGeneration
         public float DeadChance { get; }
 
 
-        private Func<Floor, Coord, GameObject> _generator;
+        private IPlaceable _generator;
 
-        public Spreader(Func<Floor, Coord, GameObject> generator, int startingEnergy, float spreadChance, float deadChance)
+        public Spreader(IPlaceable generator, int startingEnergy, float spreadChance, float deadChance)
         {
             _generator = generator;
 
@@ -59,10 +59,10 @@ namespace SpellSword.MapGeneration
                     continue;
                 }
 
-                GameObject obj = _generator(floor, next);
-
-                if (!floor.MapInfo.Map.IsWalkable(next) || !floor.MapInfo.Map.AddEntity(obj)) 
+                if (!floor.MapInfo.Map.IsWalkable(next) || !_generator.CanPlace(floor, next, rng)) 
                     continue;
+
+                _generator.Place(floor, next, rng);
 
                 explored.Add(next);
 
@@ -75,6 +75,11 @@ namespace SpellSword.MapGeneration
             }
 
             return true;
+        }
+
+        public bool CanPlace(Floor floor, Coord pos, IGenerator rng)
+        {
+            return _generator.CanPlace(floor, pos, rng);
         }
     }
 }

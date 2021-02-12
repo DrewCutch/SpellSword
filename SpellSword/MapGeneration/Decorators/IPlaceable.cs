@@ -11,5 +11,6 @@ namespace SpellSword.MapGeneration
     interface IPlaceable
     {
         bool Place(Floor floor, Coord pos, IGenerator rng);
+        bool CanPlace(Floor floor, Coord pos, IGenerator rng);
     }
 }

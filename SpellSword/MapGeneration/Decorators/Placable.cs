@@ -23,6 +23,9 @@ namespace SpellSword.MapGeneration
 
         public bool Place(Floor floor, Coord pos, IGenerator rng)
         {
+            if (!CanPlace(floor, pos, rng))
+                return false;
+
             IGameObject gameObject = _generator(floor, pos);
 
             if (gameObject.Layer == 0)
@@ -31,7 +34,15 @@ namespace SpellSword.MapGeneration
                 return true;
             }
 
+            if(!floor.MapInfo.Map.AddEntity(gameObject))
+                Console.WriteLine("Place failed!");
+
             return floor.MapInfo.Map.AddEntity(gameObject);
+        }
+
+        public bool CanPlace(Floor floor, Coord pos, IGenerator rng)
+        {
+            return floor.MapInfo.Map.GetObject(pos, floor.MapInfo.Map.LayerMasker.Mask(_layer)) == null || _canOverwrite;
         }
     }
 }
