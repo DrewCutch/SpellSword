@@ -26,8 +26,8 @@ namespace SpellSword.Algorithms
 
         public Coord GetClosestAvailablePoint(Coord coord)
         {
-            FastPriorityQueue<DijkstraNode> frontier = new FastPriorityQueue<DijkstraNode>(AvailabilityMap.Width * AvailabilityMap.Width);
-            DijkstraNode[] explored = new DijkstraNode[AvailabilityMap.Width * AvailabilityMap.Width];
+            FastPriorityQueue<DijkstraNode> frontier = new FastPriorityQueue<DijkstraNode>(AvailabilityMap.Height * AvailabilityMap.Width);
+            DijkstraNode[] explored = new DijkstraNode[AvailabilityMap.Height * AvailabilityMap.Width];
 
             AdjacencyRule adjacencyRule = Distance;
 
@@ -54,6 +54,8 @@ namespace SpellSword.Algorithms
 
                     DijkstraNode neighborNode =
                         neighborExplored ? explored[neighborIndex] : new DijkstraNode(neighbor, current);
+
+                    explored[neighborIndex] = neighborNode;
 
                     if (neighborExplored && neighborDistance < neighborNode.Distance)
                     {
