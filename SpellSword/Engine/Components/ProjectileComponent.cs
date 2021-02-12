@@ -32,7 +32,10 @@ namespace SpellSword.Engine.Components
 
             XRate = xRate == 0 ? int.MaxValue : Math.Abs(xRate);
             YRate = yRate == 0 ? int.MaxValue : Math.Abs(yRate);
+
+            _destroyOnCollide = destroyOnCollide;
         }
+
         public void Update(int ticks)
         {
             _xTicks += ticks;
@@ -56,14 +59,21 @@ namespace SpellSword.Engine.Components
                 }
 
                 Coord newPos = Parent.Position + new Coord(dX, dY);
-                if (!Parent.CurrentMap?.WalkabilityView[newPos] ?? true)
+                if (Parent.CurrentMap?.GetEntity<IGameObject>(newPos, Parent.CurrentMap.LayerMasker.Mask(Parent.Layer)) is IGameObject collideWith)
                 {
-                    OnCollide?.Invoke(Parent.CurrentMap.GetEntity<IGameObject>(newPos));
+                    OnCollide?.Invoke(collideWith);
                     _destroyOnCollide?.DoDamage(new Damage(int.MaxValue));
                     break;
                 }
-                else
-                    Parent.Position = newPos;
+
+                if(!Parent.CurrentMap?.WalkabilityView[newPos] ?? false)
+                {
+                    OnCollide?.Invoke(Parent.CurrentMap.GetObject(newPos));
+                    _destroyOnCollide?.DoDamage(new Damage(int.MaxValue));
+                    break;
+                }
+
+                Parent.Position = newPos;
             }
         }
 
