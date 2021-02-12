@@ -7,6 +7,7 @@ using GoRogue;
 using GoRogue.GameFramework;
 using GoRogue.MapGeneration;
 using GoRogue.MapViews;
+using GoRogue.Pathing;
 using GoRogue.Random;
 using SpellSword.Engine;
 using SpellSword.Engine.Components;
@@ -68,7 +69,7 @@ namespace SpellSword.MapGeneration
                 RoomConnection nextConnection = pendingConnections.Get(true);
 
                 Coord hallEnd = nextConnection.Position +
-                                new Coord(nextConnection.Direction.DeltaX, nextConnection.Direction.DeltaY) * rng.Next(2, 5);
+                                new Coord(nextConnection.Direction.DeltaX, nextConnection.Direction.DeltaY) * rng.Next(1, 8);
 
                 RoomConnection hallConnection = new RoomConnection(hallEnd, nextConnection.Direction, null, false);
 
@@ -116,7 +117,7 @@ namespace SpellSword.MapGeneration
 
                 n += 1;
             }
-
+            
             while (pendingConnections.Count > 0)
             {
                 RoomConnection nextConnection = pendingConnections.Get(true);
@@ -128,7 +129,7 @@ namespace SpellSword.MapGeneration
                 if(Distance.MANHATTAN.Calculate(nextConnection.Position, hit) > 10)
                     continue;
 
-                if(mapInfo.Map.AStar.ShortestPath(nextConnection.Position, hit).Length < 40)
+                if(mapInfo.Map.AStar.ShortestPath(nextConnection.Position, hit) is Path shortestPath && shortestPath.Length < 40)
                     continue;
 
                 SourceCursor<IHallGenerator> hallGeneratorCursor = _hallGenerators.Pull(context); ;
@@ -150,15 +151,11 @@ namespace SpellSword.MapGeneration
                     mapInfo.Map.SetTerrain(SolidRock(pos));
             }
 
-            Console.WriteLine($"Next random: {rng.Next()}");
-
             Console.WriteLine($"num rooms: {rooms.Count}");
 
             foreach (IRoom room in rooms)
             {
                 room.GeneratedBy.Populate(floor, room, rng);
-                int nextRNG = rng.Next();
-                Console.WriteLine($"Next random: {nextRNG}");
             }
 
             
@@ -166,8 +163,12 @@ namespace SpellSword.MapGeneration
             // place exit
             while (true)
             {
-                Coord randomPos = new Coord(rng.Next(0, area.Width), rng.Next(0, area.Height));
-                if (mapInfo.Map.GetTerrain(randomPos) is IGameObject terrain && terrain.IsWalkable)
+                IRoom randomRoom = rooms.RandomItem(rng);
+                Coord randomPos = randomRoom.Area.Perimeter().ToList().RandomItem(rng);
+
+                if (mapInfo.Map.WalkabilityView[randomPos] == false 
+                    && mapInfo.Map.AStar.ShortestPath(floor.Entrance, randomPos) is Path shortestPath && shortestPath.Length > 50 
+                    && mapInfo.Map.GetObject(randomPos, mapInfo.Map.LayerMasker.Mask(Layers.Main)) == null)
                 {
                     mapInfo.Map.SetTerrain(Exit(floor, randomPos));
                     floor.Exit = randomPos;
@@ -175,7 +176,7 @@ namespace SpellSword.MapGeneration
                 }
             }
 
-            Console.WriteLine($"leftover connections  = {pendingConnections.Count}");
+            Console.WriteLine($"leftover connections = {pendingConnections.Count}");
         }
 
         private static Coord Trace(Map map, Coord origin, Direction direction)
