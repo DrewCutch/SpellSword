@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Reflection;
 using System.Text;
+using Artemis.Blackboard;
 using Artemis.Utils;
 using BearLib;
 using GoRogue;
@@ -28,6 +29,7 @@ using SpellSword.Render.Panes;
 using SpellSword.Render.Particles;
 using SpellSword.RPG;
 using SpellSword.RPG.Alignment;
+using SpellSword.Speech;
 using SpellSword.TestUtils;
 using SpellSword.Time;
 using GlyphComponent = SpellSword.Engine.Components.GlyphComponent;
@@ -55,7 +57,7 @@ namespace SpellSword
             MessageBus mainBus = new MessageBus();
 
             IMapGenerator generator = new MapGenerator(timeline, mainBus);
-            IEnumerator<MapInfo> generationSteps = generator.GenerationSteps(60, 40, "" + SingletonRandom.DefaultRNG.Next()).GetEnumerator();
+            IEnumerator<MapInfo> generationSteps = generator.GenerationSteps(60, 40, SingletonRandom.DefaultRNG.Next() + "").GetEnumerator();
             generationSteps.MoveNext();
 
             
@@ -185,7 +187,7 @@ namespace SpellSword
             // Creating Player
             GameObject player = new UpdatingGameObject(new Coord(20, 20), Layers.Main, null, timeline);
 
-            Being playerBeing = new Being(new SelectedAttributes(new AttributeSet(10, 10, 10, 10, 10)), Alignment.PlayerAlignment, new EquipmentSlotSet(), 10, "You");
+            Being playerBeing = new Being(new SelectedAttributes(new AttributeSet(10, 10, 10, 10, 10)), Alignment.PlayerAlignment, new EquipmentSlotSet(), 5, "You");
 
             playerBeing.Equipment.Equip(new MeleeWeapon(new Damage(10)), EquipmentSlot.RightHandEquip);
 
@@ -198,6 +200,7 @@ namespace SpellSword
             player.AddComponent(new GlyphComponent(new Glyph(Characters.AT, Color.Aqua)));
             player.AddComponent(new LightSourceComponent(lightMap, new Light(Color.Aqua, Coord.NONE, 4, 8)));
             player.AddComponent(new FOVExplorerComponent());
+            player.AddComponent(new NameComponent(new Title("the", "Hero")));
 
             EffectTargetComponent playerEffectTarget = new EffectTargetComponent();
             playerEffectTarget.EffectTarget.AddEffectReceiver(playerActor);
@@ -294,9 +297,12 @@ namespace SpellSword
 
         private static void StartGameDungeon()
         {
+            // 1D446841
             MessageBus gameBus = new MessageBus();
+            string seed = SingletonRandom.DefaultRNG.Next().ToString("X");
+            Console.WriteLine($"Generating dungeon with seed: {seed}");
 
-            Dungeon dungeon = new Dungeon(gameBus, new Rectangle(0, 0, 60, 40), Source.From<GenerationContext, IBiome>(Biomes.TestBiome), "testseed");
+            Dungeon dungeon = new Dungeon(gameBus, new Rectangle(0, 0, 60, 40), Source.From<GenerationContext, IBiome>(Biomes.TestBiome), seed);
 
 
             JoystickConfig joystickConfig = new JoystickConfig
@@ -331,6 +337,7 @@ namespace SpellSword
             player.AddComponent(new GlyphComponent(new Glyph(Characters.AT, Color.Aqua)));
             player.AddComponent(new LightSourceComponent(initialFloor.MapInfo.LightMap, new Light(Color.Aqua, Coord.NONE, 4, 5)));
             player.AddComponent(new FOVExplorerComponent());
+            player.AddComponent(new NameComponent(new Title("the", "Hero")));
 
             EffectTargetComponent playerEffectTarget = new EffectTargetComponent();
             playerEffectTarget.EffectTarget.AddEffectReceiver(playerActor);
@@ -341,7 +348,7 @@ namespace SpellSword
             Logger logger = new Logger();
             gameBus.RegisterSubscriber(logger);
 
-            MapViewPane mapViewPane = new MapViewPane(gameBus, joystickConfig, new InventoryDisplayPane(playerBeing.Equipment, playerBeing.Inventory, joystickConfig, gameBus));
+            MapViewPane mapViewPane = new MapViewPane(gameBus, joystickConfig, new InventoryDisplayPane(playerBeing.Equipment, playerBeing.Inventory, joystickConfig, gameBus), useFOV: true);
 
             EventHandler<ItemEventArgs<IGameObject>> mapChangeDirty = (sender, eventArgs) => mapViewPane.SetDirty();
             EventHandler<ItemMovedEventArgs<IGameObject>> MapMoveDirty = (sender, eventArgs) => mapViewPane.SetDirty();
