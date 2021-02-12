@@ -82,12 +82,12 @@ namespace SpellSword.Game
             if (transition.ToFloor >= _floors.Count)
                 GenerateNextFloor();
 
-            FocusFloor = transition.ToFloor;
-
-            Floor previousFloor = _floors[transition.FromFloor];
-            Floor nextFloor = _floors[transition.ToFloor];
-
             IGameObject gameObject = transition.Target;
+
+            if(gameObject.HasComponent<FOVExplorerComponent>())
+                FocusFloor = transition.ToFloor;
+
+            Floor nextFloor = _floors[transition.ToFloor];
 
             nextFloor.MapInfo.Map.AddEntity(gameObject);
 
