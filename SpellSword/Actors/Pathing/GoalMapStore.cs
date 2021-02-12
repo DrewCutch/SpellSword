@@ -10,6 +10,7 @@ namespace SpellSword.Actors.Pathing
     class GoalMapStore
     {
         private readonly Dictionary<IGameObject, GoalMap> _goalMaps;
+        private readonly Dictionary<IGameObject, FleeMap> _fleeMaps;
 
         private event Func<bool> _updateMaps;
 
@@ -27,6 +28,7 @@ namespace SpellSword.Actors.Pathing
             _dirty = false;
 
             _goalMaps = new Dictionary<IGameObject, GoalMap>();
+            _fleeMaps = new Dictionary<IGameObject, FleeMap>();
         }
 
         private void BaseMapOnObjectRemoved(object? sender, ItemEventArgs<IGameObject> e)
@@ -63,10 +65,18 @@ namespace SpellSword.Actors.Pathing
 
         public GoalMap GetGoalMap(IGameObject target)
         {
-            if (_goalMaps.ContainsKey(target))
-                return _goalMaps[target];
+            if (!_goalMaps.ContainsKey(target))
+                CreateGoalMap(target);
 
-            return CreateGoalMap(target);
+            return _goalMaps[target];
+        }
+
+        public FleeMap GetFleeMap(IGameObject target)
+        {
+            if(!_fleeMaps.ContainsKey(target))
+                _fleeMaps[target] = new FleeMap(GetGoalMap(target),  1.1);
+
+            return _fleeMaps[target];
         }
 
         private GoalMap CreateGoalMap(IGameObject target)
