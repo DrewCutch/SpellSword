@@ -140,12 +140,26 @@ namespace SpellSword.MapGeneration.Resources
                 floor.AddComponent(new NameComponent(new Title("a", "dirt floor")));
 
                 return floor;
-            });
+            }, Layers.Terrain, true);
+
+        private static IPlaceable GoblinPlaceable = new Placable(
+            (info, pos) =>
+            {
+                return TestUtil.CreateGoblin(pos, info.Timeline, info.GoalMapStore, info.MessageBus);
+            }, 
+            Layers.Main);
+
+        private static IPlaceable GoblinArcherPlaceable = new Placable(
+            (info, pos) =>
+            {
+                return TestUtil.CreateGoblinArcher(pos, info.Timeline, info.GoalMapStore, info.MessageBus);
+            }, 
+            Layers.Main);
 
         private static Source<GenerationContext, IRoomGenerator> RootSource()
         {
             IRoomGenerator closet = new RectRoomGenerator(new Rectangle(0, 0, 4, 4), new Rectangle(0, 0, 6, 6), WallPlaceable, FloorPlacable);
-            IRoomGenerator basicRoom = new RectRoomGenerator(new Rectangle(0, 0, 8, 8), new Rectangle(0, 0, 10, 10), WallPlaceable, FloorPlacable);
+            IRoomGenerator basicRoom = new RectRoomGenerator(new Rectangle(0, 0, 6, 6), new Rectangle(0, 0, 10, 10), WallPlaceable, FloorPlacable);
             IRoomGenerator largeRoom = new RectRoomGenerator(new Rectangle(0, 0, 10, 10), new Rectangle(0, 0, 20, 20), WallPlaceable, FloorPlacable);
 
             IRoomGenerator compositeRoom = new RectCompositeRoomGenerator(2,3, new Rectangle(0, 0, 8, 8), new Rectangle(0, 0, 10, 10), WallPlaceable, FloorPlacable);
@@ -179,6 +193,8 @@ namespace SpellSword.MapGeneration.Resources
             WeightedSource<GenerationContext, IAreaDecorator> foliageSource = new WeightedSource<GenerationContext, IAreaDecorator>(true);
             foliageSource.Add(Source.From<GenerationContext, IAreaDecorator>(new PlaceableDecorator(GrassSpreader)), 1);
             foliageSource.Add(Source.From<GenerationContext, IAreaDecorator>(new PlaceableDecorator(TallGrassSpreader)), 1);
+            foliageSource.Add(Source.From<GenerationContext, IAreaDecorator>(new PlaceableDecorator(GoblinPlaceable)), 1);
+            foliageSource.Add(Source.From<GenerationContext, IAreaDecorator>(new PlaceableDecorator(GoblinArcherPlaceable)), 1);
 
             decorationSource.Add(foliageSource);
 
