@@ -5,41 +5,81 @@ using System.Linq;
 using System.Text;
 using GoRogue;
 using GoRogue.GameFramework;
+using SpellSword.Actors.Effects;
 using SpellSword.Engine;
 using SpellSword.Engine.Components;
+using SpellSword.Logging;
 using SpellSword.Render;
+using SpellSword.Render.Particles;
+using SpellSword.RPG;
+using SpellSword.RPG.Items;
 using SpellSword.Speech;
 using SpellSword.Time;
 
 namespace SpellSword.Actors.Action
 {
-    class ProjectileWeapon: IUsable
+    class ProjectileWeapon: Item, IUsable
     {
-        public Title Title { get; }
         public int Range { get; }
         public Distance RangeDistanceType => Distance.EUCLIDEAN;
 
-        public ProjectileWeapon(int range)
+        private Damage _damage { get; }
+
+        private readonly int _stamina;
+
+        public ProjectileWeapon(Damage damage, int range) : base(new Title("a", "bow"), "a short wooden bow", new Glyph(Characters.RIGHT_PARENTHESIS, Color.SaddleBrown), EquipmentSlotKind.Hand, 1)
         {
             Range = range;
-            Title = new Title("a", "bow");
+            _damage = damage;
+
+            _stamina = 3;
         }
         
         public void Use(Actor by, Coord target)
         {
             Direction fireDirection = Direction.GetDirection(by.Parent.Position, target);
 
-            GameObject projectile = new UpdatingGameObject(by.Parent.Position + fireDirection, Layers.Main, null, by.GameObject.Timeline);
-            projectile.AddComponent(new GlyphComponent(new Glyph('.', Color.Black)));
+            Coord spawnPos = by.Parent.Position + fireDirection;
 
-            ProjectileComponent projectileComponent =
-                new ProjectileComponent(fireDirection.DeltaX * 50, fireDirection.DeltaY * 50);
+            GameObject projectile = new UpdatingGameObject(spawnPos, Layers.Main, null, by.GameObject.Timeline);
+
+            Characters[] alignChars = new[] {Characters.VERTICAL_LINE, Characters.SLASH, Characters.HYPHEN, Characters.BACK_SLASH, Characters.VERTICAL_LINE, Characters.SLASH, Characters.HYPHEN, Characters.BACK_SLASH};
+
+            int dX = target.X - spawnPos.X;
+            int dY = target.Y - spawnPos.Y;
+
+            int dist = (int) Distance.MANHATTAN.Calculate(dX, dY);
+            int speed = 30;
+
+            int xVel = dX == 0 ? 0 : speed * dist / dX;
+            int yVel = dY == 0 ? 0 : speed * dist / dY;
+
+
+            Damagable damagable = new Damagable(1);
+            projectile.AddComponent(damagable);
+            projectile.AddComponent(new GlyphComponent(new Glyph(alignChars[(int) fireDirection.Type], Color.SaddleBrown))); 
+            projectile.AddComponent(new NameComponent(new Title("an", "arrow")));
+
+            ProjectileComponent projectileComponent = new ProjectileComponent(xVel, yVel, damagable);
+
+            projectileComponent.OnCollide += (gameObject) =>
+            {
+                EffectTarget effectTarget = gameObject?.GetComponent<EffectTargetComponent>()?.EffectTarget;
+
+                effectTarget?.ApplyEffect(new DamageEffect(_damage));
+
+                by.MainBus.Send(new ParticleEvent(new GlyphFlash(new Glyph(Characters.ASTERISK, Color.Red), 200,
+                    gameObject.Position)));
+
+                
+                if(gameObject.GetComponent<NameComponent>() is NameComponent nameComponent)
+                    by.MainBus.Send(new LogMessage($"{{0}} was hit by {{1}}'s arrow", new LogLink(nameComponent.Title.ToString(), Color.Aquamarine, by), new LogLink(by.Being.Name, Color.Aquamarine, by)));
+            };
+
+
             projectile.AddComponent(projectileComponent);
 
-
-
             by.MainBus.Send(new SpawnEvent(projectile));
-            Console.WriteLine("Fired arrow!");
         }
 
         public bool CanUse(Actor by, Coord target)
@@ -64,7 +104,7 @@ namespace SpellSword.Actors.Action
 
         public EventTimerTiming UseTiming(Actor by)
         {
-            return new EventTimerTiming(50, 150);
+            return new EventTimerTiming(100, 400);
         }
 
         public IAimVisualization GetVisualization(Actor by, Coord target)
