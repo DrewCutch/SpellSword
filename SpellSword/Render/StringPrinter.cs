@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
+using System.Text.RegularExpressions;
 using BearLib;
 using GoRogue;
 using Microsoft.VisualBasic.CompilerServices;
@@ -19,8 +20,8 @@ namespace SpellSword.Render
 
             int currentLine = y;
             int currentChar = x;
-            
-            foreach (string word in message.Message.Split(' '))
+
+            foreach (string word in Regex.Split(message.Message, @"({[0-9]+})"))
             {
                 bool isLink = IsLink(word);
                 int linkIndex = isLink ? LinkIndex(word) : -1;
@@ -41,7 +42,7 @@ namespace SpellSword.Render
                         linkMask[pos] = message.Links[linkIndex].Linkable;
                     }
 
-                currentChar += str.Length + 1;
+                currentChar += str.Length;
             }
 
             return new LinkPrint(linkMask, new Coord(currentChar, currentLine));
