@@ -27,7 +27,7 @@ namespace SpellSword.Speech
 
         public override string ToString()
         {
-            return Article + " " + Name;
+            return Article.WithTrailingSpace() + Name;
         }
     }
 }
