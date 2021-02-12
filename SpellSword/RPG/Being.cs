@@ -71,7 +71,7 @@ namespace SpellSword
 
             Inventory = new Inventory();
 
-            Health = new ResourceMeter(20, 5);
+            Health = new ResourceMeter(10 * level, 5);
             Health.OnDeplete += OnZeroHealth;
 
             Stamina = new ResourceMeter(20, 0);
@@ -90,7 +90,7 @@ namespace SpellSword
 
         public EventTimerTiming GetMovementTiming()
         {
-            return new EventTimerTiming(500 / Attributes.Dexterity, 500 / Attributes.Dexterity);  
+            return new EventTimerTiming(300 / Attributes.Dexterity, 300 / Attributes.Dexterity);  
         }
 
         public void DoDamage(Damage damage)
